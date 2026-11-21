@@ -1,68 +1,34 @@
-import {
-  drawPulseHeartShield,
-  drawShatterParticles,
-  drawVerticalStepCard,
-  drawAnimatedArrow,
-} from './utama.mjs';
+import { drawStepFlowPill } from './utama.mjs';
 
-export default function renderScene(ctx, { scene, sceneIndex, localT, totalT, durationSec, progress, sceneAlpha, h }) {
+export default function renderScene(ctx, { scene, localT, totalT, durationSec, sceneAlpha, h }) {
   ctx.save();
   ctx.globalAlpha = sceneAlpha;
 
   const cam = h.createCameraState(localT, durationSec, {
-    zoomStart: 1.03,
+    zoomStart: 1.022,
     zoomEnd: 1.0,
-    driftX: 9,
-    driftY: 11,
   });
 
   ctx.save();
   h.applyCamera(ctx, cam);
 
-  h.drawCosmicBackdrop(ctx, totalT, sceneIndex, {
-    accentTop: '#082522',
-    accentGlow: h.THEME.turqMid,
-    turqGlow: h.THEME.goldMedina,
-    rayIntensity: 0.22,
-    rosetteAlpha: 0.14,
-  });
+  h.drawArchitecturalStage(ctx, totalT, 'justice');
+  h.drawInterceptGateDiagram(ctx, h.WIDTH / 2, 1080, localT);
 
-  // Protective Taqwa Shield dissolving negative impulse into light
-  drawPulseHeartShield(ctx, h.WIDTH / 2, 830, 145, h.clamp01(localT / 0.75), totalT, 'shield');
-  drawShatterParticles(ctx, h.WIDTH / 2, 830, h.clamp01((localT - 1.2) / 1.8), totalT, h.THEME.turqBright);
-
-  // Transformation Step Cards
-  drawVerticalStepCard(
+  drawStepFlowPill(
     ctx,
     h.WIDTH / 2,
-    1185,
-    1060,
-    142,
-    '×',
-    'NIAT BURUK MUNCUL',
-    'Dorongan hati ingin berbuat dosa atau maksiat',
-    h.THEME.crimsonBright,
-    h.clamp01((localT - 0.6) / 0.7),
-  );
-
-  drawAnimatedArrow(ctx, h.WIDTH / 2, 1265, h.WIDTH / 2, 1365, h.clamp01((localT - 1.5) / 0.5), h.THEME.turqBright, 5);
-
-  drawVerticalStepCard(
-    ctx,
-    h.WIDTH / 2,
-    1465,
-    1060,
-    152,
+    1545,
     '+1',
-    'DIURUNGKAN KARENA ALLAH',
-    'Malaikat mencatatnya sebagai 1 kebaikan sempurna',
+    'MENGURUNGKAN MAKSIAT KARENA ALLAH',
+    'Bukan sekadar bebas dari dosa, penolakan itu berubah menjadi satu pahala sempurna',
     h.THEME.goldBright,
-    h.clamp01((localT - 1.9) / 0.8),
+    h.clamp01((localT - 2.0) / 0.7),
   );
 
-  h.drawArabicPlaque(ctx, scene, h.WIDTH / 2, 1800, 1100, localT, {
-    delay: 1.2,
-    arabicSize: 52,
+  h.drawArabicPlaque(ctx, scene, h.WIDTH / 2, 1815, 1120, localT, {
+    delay: 1.3,
+    arabicSize: 50,
     showTrans: true,
   });
 

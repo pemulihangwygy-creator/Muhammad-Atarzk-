@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 /**
- * Engine Visual 2K 90FPS — "Kenapa Satu Kebaikan Dibalas 700 Kali Lipat dalam Islam?"
- * Identitas Visual: Luminous Emerald & Celestial Medina Gold / Sacred Girih Geometry
- * Arsitektur: Multi-worker Skia Canvas vector/particle compositor + FFmpeg rawvideo pipe
+ * Engine Visual 2K 90FPS — Studio Motion Graphics Edition
+ * Topik: "Kenapa Satu Kebaikan Dibalas 700 Kali Lipat dalam Islam?"
+ * Arsitektur: Multi-worker Skia Canvas vector compositor + FFmpeg rawvideo pipe
  */
 import { Canvas, FontLibrary } from 'skia-canvas';
 import { execFileSync, spawn } from 'node:child_process';
@@ -22,46 +22,137 @@ import {
 } from './script.mjs';
 
 // ============================================================================
-// 1. PALET & IDENTITAS VISUAL ("LUMINOUS EMERALD & CELESTIAL MEDINA GOLD")
+// 1. EDITORIAL COLOR SYSTEM & STUDIO PALETTES
 // ============================================================================
 
 export const THEME = {
-  bgObsidian: '#030A09',
-  bgEmeraldDeep: '#061815',
-  bgEmeraldMid: '#0A2922',
-  bgEmeraldSoft: '#113A30',
-  bgAmberTint: '#1E1A0E',
+  bgObsidian: '#050C0B',
+  bgEmeraldDeep: '#071714',
+  bgEmeraldMid: '#0B231E',
+  bgEmeraldCard: '#0A1E1A',
+  bgIndigoDeep: '#07131E',
+  bgIndigoMid: '#0D2133',
+  bgDesertDeep: '#14110B',
+  bgDesertMid: '#211B11',
 
   goldBright: '#FFE48C',
-  goldMedina: '#F5C451',
-  goldBurnished: '#D49A2A',
-  goldDeep: '#8A5D14',
+  goldMedina: '#D9AF43',
+  goldAmber: '#B88422',
+  goldDeep: '#6B4D12',
 
-  turqBright: '#5DF2D6',
-  turqMid: '#26B99F',
-  turqDeep: '#0E5B4F',
+  turqBright: '#3EE6C8',
+  turqMid: '#18A890',
+  turqDeep: '#0B4D43',
 
-  ivory: '#F8F2E4',
-  ivoryMuted: '#C8C2B2',
-  slateText: '#9AB0A9',
+  crimsonBright: '#FF6B6B',
+  crimsonMid: '#D94848',
+  crimsonDeep: '#5C1B1B',
 
-  crimsonBright: '#FF6B63',
-  crimsonDeep: '#8E2520',
+  silverBright: '#D7E0E4',
+  silverMid: '#8C9BA3',
 
-  glassDark: 'rgba(5, 19, 16, 0.78)',
-  glassCard: 'rgba(8, 28, 24, 0.72)',
-  glassBorderGold: 'rgba(245, 196, 81, 0.36)',
-  glassBorderTurq: 'rgba(93, 242, 214, 0.28)',
+  ivory: '#F6F4EC',
+  ivoryMuted: '#B8C2BD',
+  slateText: '#7E8E88',
+  gridLine: '#1B3A33',
 };
+
+export const STAGE_PALETTES = {
+  emerald: { top: '#061512', mid: '#0C2822', bot: '#040B0A', key: '#D9AF43', rim: '#18A890' },
+  justice: { top: '#0B1716', mid: '#112523', bot: '#050B0A', key: '#D9AF43', rim: '#D94848' },
+  botanical: { top: '#061813', mid: '#0D2E24', bot: '#040B09', key: '#E5BD4D', rim: '#3EE6C8' },
+  nocturne: { top: '#06111B', mid: '#0C2032', bot: '#040A10', key: '#3EE6C8', rim: '#D9AF43' },
+  desert: { top: '#13100A', mid: '#231C11', bot: '#090704', key: '#E8B84B', rim: '#18A890' },
+  finale: { top: '#071A15', mid: '#103128', bot: '#040C0A', key: '#FFE48C', rim: '#3EE6C8' },
+};
+
+// ============================================================================
+// 2. FONT REGISTRATION (@fontsource WOFF2)
+// ============================================================================
+
+let fontsReady = false;
+
+export function initFonts() {
+  if (fontsReady) return;
+  const fsDir = join(ROOT, 'node_modules', '@fontsource');
+  FontLibrary.use('Amiri', [
+    join(fsDir, 'amiri', 'files', 'amiri-arabic-400-normal.woff2'),
+    join(fsDir, 'amiri', 'files', 'amiri-arabic-700-normal.woff2'),
+  ]);
+  FontLibrary.use('Cinzel', [
+    join(fsDir, 'cinzel', 'files', 'cinzel-latin-700-normal.woff2'),
+    join(fsDir, 'cinzel', 'files', 'cinzel-latin-900-normal.woff2'),
+  ]);
+  FontLibrary.use('Jakarta', [
+    join(fsDir, 'plus-jakarta-sans', 'files', 'plus-jakarta-sans-latin-500-normal.woff2'),
+    join(fsDir, 'plus-jakarta-sans', 'files', 'plus-jakarta-sans-latin-700-normal.woff2'),
+    join(fsDir, 'plus-jakarta-sans', 'files', 'plus-jakarta-sans-latin-800-normal.woff2'),
+  ]);
+  FontLibrary.use('Playfair', [
+    join(fsDir, 'playfair-display', 'files', 'playfair-display-latin-600-italic.woff2'),
+    join(fsDir, 'playfair-display', 'files', 'playfair-display-latin-700-normal.woff2'),
+  ]);
+  FontLibrary.use('JetBrains', [
+    join(fsDir, 'jetbrains-mono', 'files', 'jetbrains-mono-latin-600-normal.woff2'),
+    join(fsDir, 'jetbrains-mono', 'files', 'jetbrains-mono-latin-700-normal.woff2'),
+  ]);
+  fontsReady = true;
+}
+
+// ============================================================================
+// 3. MOTION CURVES, SPRING DYNAMICS & COLOR UTILITIES
+// ============================================================================
+
+export const TAU = Math.PI * 2;
+export const clamp = (v, min, max) => (v < min ? min : v > max ? max : v);
+export const clamp01 = (v) => clamp(v, 0, 1);
+export const lerp = (a, b, t) => a + (b - a) * t;
+export const invLerp = (a, b, v) => (b === a ? 0 : clamp01((v - a) / (b - a)));
+export const smoothstep = (e0, e1, x) => {
+  const t = clamp01((x - e0) / (e1 - e0));
+  return t * t * (3 - 2 * t);
+};
+
+export const easeOutCubic = (t) => 1 - Math.pow(1 - clamp01(t), 3);
+export const easeOutQuart = (t) => 1 - Math.pow(1 - clamp01(t), 4);
+export const easeInOutQuart = (t) => {
+  const x = clamp01(t);
+  return x < 0.5 ? 8 * x * x * x * x : 1 - Math.pow(-2 * x + 2, 4) / 2;
+};
+export const easeOutExpo = (t) => {
+  const x = clamp01(t);
+  return x === 1 ? 1 : 1 - Math.pow(2, -10 * x);
+};
+export const easeOutBack = (t, s = 1.45) => {
+  const x = clamp01(t) - 1;
+  return 1 + (s + 1) * x * x * x + s * x * x;
+};
+export const easeOutElastic = (t) => {
+  const x = clamp01(t);
+  if (x === 0 || x === 1) return x;
+  return Math.pow(2, -10 * x) * Math.sin((x * 10 - 0.75) * ((2 * Math.PI) / 3)) + 1;
+};
+
+// Critically/lightly damped editorial spring
+export function springVal(t, stiffness = 170, damping = 18) {
+  if (t <= 0) return 0;
+  const omega = Math.sqrt(stiffness);
+  const zeta = damping / (2 * omega);
+  if (zeta < 1) {
+    const wd = omega * Math.sqrt(1 - zeta * zeta);
+    return clamp(1 - Math.exp(-zeta * omega * t) * (Math.cos(wd * t) + (zeta / Math.sqrt(1 - zeta * zeta)) * Math.sin(wd * t)), 0, 1.15);
+  }
+  return clamp01(1 - Math.exp(-omega * t) * (1 + omega * t));
+}
+
+export function stagger(localT, index, step = 0.14, dur = 0.55) {
+  return clamp01((localT - index * step) / dur);
+}
 
 export function hexToRgb(hex) {
   const clean = hex.replace('#', '');
-  const num = parseInt(clean, 16);
-  return {
-    r: (num >> 16) & 255,
-    g: (num >> 8) & 255,
-    b: num & 255,
-  };
+  const n = parseInt(clean, 16);
+  return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
 }
 
 export function rgba(hex, alpha) {
@@ -70,256 +161,59 @@ export function rgba(hex, alpha) {
 }
 
 export function lerpColor(hexA, hexB, t) {
-  const u = clamp01(t);
   const a = hexToRgb(hexA);
   const b = hexToRgb(hexB);
-  const r = Math.round(a.r + (b.r - a.r) * u);
-  const g = Math.round(a.g + (b.g - a.g) * u);
-  const bl = Math.round(a.b + (b.b - a.b) * u);
+  const u = clamp01(t);
+  const r = Math.round(lerp(a.r, b.r, u));
+  const g = Math.round(lerp(a.g, b.g, u));
+  const bl = Math.round(lerp(a.b, b.b, u));
   return `rgb(${r}, ${g}, ${bl})`;
 }
 
 // ============================================================================
-// 2. REGISTRASI FONT TIPOGRAFI ARAB & LATIN
-// ============================================================================
-
-let fontsLoaded = false;
-
-export function initFonts() {
-  if (fontsLoaded) return;
-  const f = (pkg, file) => join(ROOT, 'node_modules', pkg, 'files', file);
-
-  FontLibrary.use('Amiri', [
-    f('@fontsource/amiri', 'amiri-arabic-400-normal.woff2'),
-    f('@fontsource/amiri', 'amiri-arabic-700-normal.woff2'),
-  ]);
-  FontLibrary.use('Cinzel', [
-    f('@fontsource/cinzel', 'cinzel-latin-600-normal.woff2'),
-    f('@fontsource/cinzel', 'cinzel-latin-700-normal.woff2'),
-    f('@fontsource/cinzel', 'cinzel-latin-800-normal.woff2'),
-    f('@fontsource/cinzel', 'cinzel-latin-900-normal.woff2'),
-  ]);
-  FontLibrary.use('Playfair', [
-    f('@fontsource/playfair-display', 'playfair-display-latin-600-normal.woff2'),
-    f('@fontsource/playfair-display', 'playfair-display-latin-700-normal.woff2'),
-    f('@fontsource/playfair-display', 'playfair-display-latin-700-italic.woff2'),
-  ]);
-  FontLibrary.use('Jakarta', [
-    f('@fontsource/plus-jakarta-sans', 'plus-jakarta-sans-latin-400-normal.woff2'),
-    f('@fontsource/plus-jakarta-sans', 'plus-jakarta-sans-latin-500-normal.woff2'),
-    f('@fontsource/plus-jakarta-sans', 'plus-jakarta-sans-latin-600-normal.woff2'),
-    f('@fontsource/plus-jakarta-sans', 'plus-jakarta-sans-latin-700-normal.woff2'),
-    f('@fontsource/plus-jakarta-sans', 'plus-jakarta-sans-latin-800-normal.woff2'),
-  ]);
-  FontLibrary.use('JetBrains', [
-    f('@fontsource/jetbrains-mono', 'jetbrains-mono-latin-400-normal.woff2'),
-    f('@fontsource/jetbrains-mono', 'jetbrains-mono-latin-600-normal.woff2'),
-    f('@fontsource/jetbrains-mono', 'jetbrains-mono-latin-700-normal.woff2'),
-  ]);
-
-  fontsLoaded = true;
-}
-
-// ============================================================================
-// 3. MATEMATIKA GERAK, FISIKA PEGAS & NOISE DETERMINISTIK
-// ============================================================================
-
-export const TAU = Math.PI * 2;
-
-export function clamp(v, min, max) {
-  return v < min ? min : v > max ? max : v;
-}
-
-export function clamp01(v) {
-  return v < 0 ? 0 : v > 1 ? 1 : v;
-}
-
-export function lerp(a, b, t) {
-  return a + (b - a) * t;
-}
-
-export function invLerp(a, b, v) {
-  if (Math.abs(b - a) < 1e-9) return 0;
-  return clamp01((v - a) / (b - a));
-}
-
-export function remap(v, inMin, inMax, outMin, outMax) {
-  return lerp(outMin, outMax, invLerp(inMin, inMax, v));
-}
-
-export function smoothstep(edge0, edge1, x) {
-  const t = invLerp(edge0, edge1, x);
-  return t * t * (3 - 2 * t);
-}
-
-export function smootherstep(edge0, edge1, x) {
-  const t = invLerp(edge0, edge1, x);
-  return t * t * t * (t * (t * 6 - 15) + 10);
-}
-
-export function easeOutCubic(t) {
-  const u = clamp01(t);
-  return 1 - Math.pow(1 - u, 3);
-}
-
-export function easeInOutCubic(t) {
-  const u = clamp01(t);
-  return u < 0.5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2;
-}
-
-export function easeOutExpo(t) {
-  const u = clamp01(t);
-  return u === 1 ? 1 : 1 - Math.pow(2, -10 * u);
-}
-
-export function easeInOutQuint(t) {
-  const u = clamp01(t);
-  return u < 0.5 ? 16 * u * u * u * u * u : 1 - Math.pow(-2 * u + 2, 5) / 2;
-}
-
-export function easeOutBack(t, overshoot = 1.70158) {
-  const u = clamp01(t);
-  const c3 = overshoot + 1;
-  return 1 + c3 * Math.pow(u - 1, 3) + overshoot * Math.pow(u - 1, 2);
-}
-
-export function easeOutElastic(t) {
-  const u = clamp01(t);
-  if (u === 0 || u === 1) return u;
-  const c4 = TAU / 3;
-  return Math.pow(2, -10 * u) * Math.sin((u * 10 - 0.75) * c4) + 1;
-}
-
-export function spring(t, { stiffness = 180, damping = 18, mass = 1, velocity = 0 } = {}) {
-  if (t <= 0) return 0;
-  const w0 = Math.sqrt(stiffness / mass);
-  const zeta = damping / (2 * Math.sqrt(stiffness * mass));
-  if (zeta < 1) {
-    const wd = w0 * Math.sqrt(1 - zeta * zeta);
-    const envelope = Math.exp(-zeta * w0 * t);
-    const a = 1;
-    const b = (zeta * w0 * a - velocity) / wd;
-    return 1 - envelope * (a * Math.cos(wd * t) + b * Math.sin(wd * t));
-  }
-  const envelope = Math.exp(-w0 * t);
-  return 1 - envelope * (1 + (w0 - velocity) * t);
-}
-
-export function mulberry32(seed) {
-  let a = seed >>> 0;
-  return function () {
-    a |= 0;
-    a = (a + 0x6d2b79f5) | 0;
-    let t = Math.imul(a ^ (a >>> 15), 1 | a);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
-function hash2D(ix, iy) {
-  let n = Math.imul(ix, 374761393) + Math.imul(iy, 668265263);
-  n = (n ^ (n >>> 13)) * 1274126177;
-  return ((n ^ (n >>> 16)) >>> 0) / 4294967296;
-}
-
-export function noise2D(x, y) {
-  const ix = Math.floor(x);
-  const iy = Math.floor(y);
-  const fx = x - ix;
-  const fy = y - iy;
-  const ux = fx * fx * (3 - 2 * fx);
-  const uy = fy * fy * (3 - 2 * fy);
-  const a = hash2D(ix, iy);
-  const b = hash2D(ix + 1, iy);
-  const c = hash2D(ix, iy + 1);
-  const d = hash2D(ix + 1, iy + 1);
-  return lerp(lerp(a, b, ux), lerp(c, d, ux), uy);
-}
-
-export function fbm2D(x, y, octaves = 3) {
-  let val = 0;
-  let amp = 0.5;
-  let freq = 1;
-  let norm = 0;
-  for (let i = 0; i < octaves; i++) {
-    val += amp * noise2D(x * freq, y * freq);
-    norm += amp;
-    amp *= 0.5;
-    freq *= 2.02;
-  }
-  return val / norm;
-}
-
-// ============================================================================
-// 4. RIG KAMERA VIRTUAL & PROYEKSI 3D
+// 4. PRECISION EDITORIAL CAMERA & PRIMITIVES
 // ============================================================================
 
 export function createCameraState(localT, durationSec, opts = {}) {
-  const {
-    zoomStart = 1.02,
-    zoomEnd = 1.0,
-    driftX = 10,
-    driftY = 12,
-    shake = 0,
-    shakeDecay = 4.5,
-  } = opts;
-  const u = clamp01(localT / Math.max(0.1, durationSec));
-  const breatheX = Math.sin(localT * 0.72) * driftX + Math.cos(localT * 0.37) * (driftX * 0.4);
-  const breatheY = Math.cos(localT * 0.58) * driftY + Math.sin(localT * 0.31) * (driftY * 0.35);
-  const shakeEnv = shake * Math.exp(-localT * shakeDecay);
-  const sx = shakeEnv * Math.sin(localT * 47.0);
-  const sy = shakeEnv * Math.cos(localT * 53.0);
-  const zoom = lerp(zoomStart, zoomEnd, easeOutCubic(Math.min(1, u * 1.4))) + Math.sin(localT * 0.45) * 0.004;
-  return {
-    x: breatheX + sx,
-    y: breatheY + sy,
-    zoom,
-    rot: Math.sin(localT * 0.25) * 0.0035,
-  };
+  const { zoomStart = 1.022, zoomEnd = 1.0, panX = 0, panY = 0, pushAt = null } = opts;
+  const p = clamp01(localT / Math.max(0.1, durationSec));
+  let zoom = lerp(zoomStart, zoomEnd, easeOutCubic(p));
+  if (pushAt !== null && localT > pushAt) {
+    const qp = clamp01((localT - pushAt) / 0.8);
+    zoom += Math.sin(qp * Math.PI) * 0.012;
+  }
+  const x = panX * easeInOutQuart(p);
+  const y = panY * easeInOutQuart(p);
+  return { zoom, x, y };
 }
 
-export function applyCamera(ctx, cam, pivotX = WIDTH / 2, pivotY = HEIGHT / 2) {
-  ctx.translate(pivotX + cam.x, pivotY + cam.y);
-  ctx.rotate(cam.rot);
+export function applyCamera(ctx, cam) {
+  ctx.translate(WIDTH / 2 + cam.x, HEIGHT / 2 + cam.y);
   ctx.scale(cam.zoom, cam.zoom);
-  ctx.translate(-pivotX, -pivotY);
+  ctx.translate(-WIDTH / 2, -HEIGHT / 2);
 }
-
-export function project3D(x, y, z, fov = 1100, cx = WIDTH / 2, cy = HEIGHT / 2) {
-  const scale = fov / Math.max(80, fov + z);
-  return {
-    x: cx + x * scale,
-    y: cy + y * scale,
-    scale,
-  };
-}
-
-// ============================================================================
-// 5. PRIMITIF GRAFIS & GEOMETRI ISLAMI PROSEDURAL
-// ============================================================================
 
 export function roundRectPath(ctx, x, y, w, h, r) {
-  const rad = Math.min(r, w / 2, h / 2);
+  const rr = Math.min(r, w / 2, h / 2);
   ctx.beginPath();
-  ctx.moveTo(x + rad, y);
-  ctx.lineTo(x + w - rad, y);
-  ctx.quadraticCurveTo(x + w, y, x + w, y + rad);
-  ctx.lineTo(x + w, y + h - rad);
-  ctx.quadraticCurveTo(x + w, y + h, x + w - rad, y + h);
-  ctx.lineTo(x + rad, y + h);
-  ctx.quadraticCurveTo(x, y + h, x, y + h - rad);
-  ctx.lineTo(x, y + rad);
-  ctx.quadraticCurveTo(x, y, x + rad, y);
+  ctx.moveTo(x + rr, y);
+  ctx.lineTo(x + w - rr, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + rr);
+  ctx.lineTo(x + w, y + h - rr);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - rr, y + h);
+  ctx.lineTo(x + rr, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - rr);
+  ctx.lineTo(x, y + rr);
+  ctx.quadraticCurveTo(x, y, x + rr, y);
   ctx.closePath();
 }
 
-export function drawGlowingLine(ctx, x1, y1, x2, y2, color, width = 2, glow = 12) {
+export function drawStrokeLine(ctx, x1, y1, x2, y2, color, width = 2.5, alpha = 1) {
   ctx.save();
+  ctx.globalAlpha = alpha;
   ctx.strokeStyle = color;
   ctx.lineWidth = width;
   ctx.lineCap = 'round';
-  ctx.shadowColor = color;
-  ctx.shadowBlur = glow;
   ctx.beginPath();
   ctx.moveTo(x1, y1);
   ctx.lineTo(x2, y2);
@@ -327,688 +221,420 @@ export function drawGlowingLine(ctx, x1, y1, x2, y2, color, width = 2, glow = 12
   ctx.restore();
 }
 
-export function drawFourPointStar(ctx, x, y, size, alpha = 1, color = THEME.goldBright, rot = 0) {
-  if (alpha <= 0.01 || size <= 0.2) return;
+export function drawRegistrationMark(ctx, x, y, size = 8, color = THEME.goldMedina, alpha = 0.45) {
   ctx.save();
-  ctx.translate(x, y);
-  ctx.rotate(rot);
-  ctx.globalAlpha = clamp01(alpha);
-  ctx.fillStyle = color;
+  ctx.globalAlpha = alpha;
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 1.6;
   ctx.beginPath();
-  const inner = size * 0.22;
-  for (let i = 0; i < 8; i++) {
-    const a = (i * Math.PI) / 4;
-    const rad = i % 2 === 0 ? size : inner;
-    const px = Math.cos(a) * rad;
-    const py = Math.sin(a) * rad;
-    if (i === 0) ctx.moveTo(px, py);
-    else ctx.lineTo(px, py);
-  }
-  ctx.closePath();
-  ctx.fill();
+  ctx.moveTo(x - size, y);
+  ctx.lineTo(x + size, y);
+  ctx.moveTo(x, y - size);
+  ctx.lineTo(x, y + size);
+  ctx.stroke();
   ctx.restore();
 }
 
-export function drawRubElHizb(ctx, cx, cy, radius, rot = 0, strokeColor = THEME.goldMedina, lineWidth = 2.5, fillColor = null) {
+export function drawRubElHizbBadge(ctx, cx, cy, r, rot = 0, strokeColor = THEME.goldMedina, lw = 2, fillColor = null) {
   ctx.save();
   ctx.translate(cx, cy);
   ctx.rotate(rot);
-  const side = radius * Math.SQRT2;
-  const half = side / 2;
-
-  for (let k = 0; k < 2; k++) {
+  const drawSq = (angle) => {
     ctx.save();
-    ctx.rotate((k * Math.PI) / 4);
+    ctx.rotate(angle);
     ctx.beginPath();
-    ctx.rect(-half, -half, side, side);
+    ctx.rect(-r * 0.707, -r * 0.707, r * 1.414, r * 1.414);
     if (fillColor) {
       ctx.fillStyle = fillColor;
       ctx.fill();
     }
     ctx.strokeStyle = strokeColor;
-    ctx.lineWidth = lineWidth;
+    ctx.lineWidth = lw;
     ctx.stroke();
     ctx.restore();
-  }
-  ctx.restore();
-}
-
-export function drawGirihRosette(ctx, cx, cy, outerR, folds = 12, rot = 0, progress = 1, opts = {}) {
-  const {
-    strokeColor = THEME.goldMedina,
-    accentColor = THEME.turqBright,
-    alpha = 0.85,
-    lineWidth = 2.2,
-    glow = true,
-    innerDetail = true,
-  } = opts;
-  if (progress <= 0.005 || alpha <= 0.005) return;
-
-  const p = clamp01(progress);
-  ctx.save();
-  ctx.translate(cx, cy);
-  ctx.rotate(rot);
-  ctx.globalAlpha = alpha;
-
-  if (glow) {
-    ctx.shadowColor = rgba(strokeColor.startsWith('#') ? strokeColor : THEME.goldMedina, 0.45);
-    ctx.shadowBlur = 18;
-  }
-
-  // Outer celestial ring
-  ctx.strokeStyle = strokeColor;
-  ctx.lineWidth = lineWidth * 0.85;
-  ctx.beginPath();
-  ctx.arc(0, 0, outerR, 0, TAU * p);
-  ctx.stroke();
-
-  if (p > 0.15) {
-    const p2 = clamp01((p - 0.15) / 0.85);
-    ctx.beginPath();
-    ctx.arc(0, 0, outerR * 0.91, 0, TAU * p2);
-    ctx.strokeStyle = rgba(THEME.goldBright, 0.35);
-    ctx.lineWidth = lineWidth * 0.55;
-    ctx.stroke();
-  }
-
-  // Primary interlocking star polygons (step k=5 for 12-fold, k=3 for 8-fold)
-  const step = folds >= 12 ? 5 : Math.max(2, Math.floor(folds / 3));
-  const rings = [
-    { r: outerR * 0.88, w: lineWidth * 1.15, col: strokeColor },
-    { r: outerR * 0.64, w: lineWidth * 0.9, col: accentColor },
-  ];
-
-  for (let rIdx = 0; rIdx < rings.length; rIdx++) {
-    if (rIdx === 1 && !innerDetail) continue;
-    const rg = rings[rIdx];
-    const subP = clamp01((p - rIdx * 0.14) / 0.86);
-    if (subP <= 0) continue;
-
-    ctx.strokeStyle = rg.col;
-    ctx.lineWidth = rg.w;
-    const totalEdges = folds;
-    const drawnEdges = subP * totalEdges;
-
-    for (let i = 0; i < totalEdges; i++) {
-      if (i > drawnEdges) break;
-      const frac = Math.min(1, drawnEdges - i);
-      const a0 = (i * TAU) / folds;
-      const a1 = (((i + step) % folds) * TAU) / folds;
-      const x0 = Math.cos(a0) * rg.r;
-      const y0 = Math.sin(a0) * rg.r;
-      const x1 = Math.cos(a1) * rg.r;
-      const y1 = Math.sin(a1) * rg.r;
-      ctx.beginPath();
-      ctx.moveTo(x0, y0);
-      ctx.lineTo(lerp(x0, x1, frac), lerp(y0, y1, frac));
-      ctx.stroke();
-    }
-  }
-
-  // Petal filigree & vertex nodes
-  if (innerDetail && p > 0.35) {
-    const p3 = clamp01((p - 0.35) / 0.65);
-    ctx.strokeStyle = rgba(THEME.goldBright, 0.55 * p3);
-    ctx.lineWidth = lineWidth * 0.7;
-    for (let i = 0; i < folds; i++) {
-      const a = (i * TAU) / folds;
-      const nx = Math.cos(a) * outerR * 0.88;
-      const ny = Math.sin(a) * outerR * 0.88;
-      const mx = Math.cos(a + Math.PI / folds) * outerR * 0.44;
-      const my = Math.sin(a + Math.PI / folds) * outerR * 0.44;
-
-      ctx.beginPath();
-      ctx.moveTo(0, 0);
-      ctx.quadraticCurveTo(mx, my, nx * p3, ny * p3);
-      ctx.stroke();
-
-      if (p3 > 0.7) {
-        ctx.fillStyle = THEME.goldBright;
-        ctx.beginPath();
-        ctx.arc(nx, ny, 3.6, 0, TAU);
-        ctx.fill();
-      }
-    }
-
-    // Center Khatam octagon
-    drawRubElHizb(ctx, 0, 0, outerR * 0.24 * easeOutBack(p3), -rot * 1.5, THEME.goldBright, lineWidth * 0.9);
-  }
-
-  ctx.restore();
-}
-
-export function drawMihrabArch(ctx, cx, topY, w, h, progress = 1, alpha = 0.35) {
-  const p = clamp01(progress);
-  if (p <= 0.01) return;
-  ctx.save();
-  ctx.globalAlpha = alpha * p;
-  const halfW = w / 2;
-  const springY = topY + h * 0.34;
-  const bottomY = topY + h;
-
-  const traceArch = (inset) => {
-    const hw = halfW - inset;
-    const ty = topY + inset * 1.1;
-    const sy = springY + inset * 0.3;
-    const by = bottomY - inset;
-    ctx.beginPath();
-    ctx.moveTo(cx - hw, by);
-    ctx.lineTo(cx - hw, sy);
-    ctx.bezierCurveTo(cx - hw, ty + (sy - ty) * 0.35, cx - hw * 0.35, ty + 28, cx, ty);
-    ctx.bezierCurveTo(cx + hw * 0.35, ty + 28, cx + hw, ty + (sy - ty) * 0.35, cx + hw, sy);
-    ctx.lineTo(cx + hw, by);
   };
+  drawSq(0);
+  drawSq(Math.PI / 4);
+  ctx.restore();
+}
 
-  // Ambient inner glow fill
-  traceArch(0);
-  const grad = ctx.createLinearGradient(cx, topY, cx, bottomY);
-  grad.addColorStop(0, rgba(THEME.goldMedina, 0.18));
-  grad.addColorStop(0.45, rgba(THEME.turqMid, 0.08));
-  grad.addColorStop(1, rgba(THEME.bgObsidian, 0));
+export function drawBevelCard(ctx, x, y, w, h, opts = {}) {
+  const {
+    radius = 24,
+    accent = THEME.goldMedina,
+    bgTop = 'rgba(13, 35, 30, 0.92)',
+    bgBot = 'rgba(6, 17, 15, 0.96)',
+    borderAlpha = 0.55,
+    headerLabel = '',
+    headerColor = accent,
+    shadow = true,
+  } = opts;
+
+  ctx.save();
+  roundRectPath(ctx, x, y, w, h, radius);
+  const grad = ctx.createLinearGradient(x, y, x, y + h);
+  grad.addColorStop(0, bgTop);
+  grad.addColorStop(1, bgBot);
   ctx.fillStyle = grad;
+  if (shadow) {
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.45)';
+    ctx.shadowBlur = 28;
+    ctx.shadowOffsetY = 10;
+  }
   ctx.fill();
-
-  // Outer gold frame
-  ctx.strokeStyle = rgba(THEME.goldMedina, 0.75);
-  ctx.lineWidth = 3;
-  ctx.shadowColor = rgba(THEME.goldMedina, 0.4);
-  ctx.shadowBlur = 16;
-  traceArch(0);
-  ctx.stroke();
-
-  // Inner filigree frame
   ctx.shadowBlur = 0;
-  ctx.strokeStyle = rgba(THEME.goldBright, 0.38);
-  ctx.lineWidth = 1.4;
-  traceArch(18);
+  ctx.shadowOffsetY = 0;
+
+  ctx.strokeStyle = rgba(accent, borderAlpha);
+  ctx.lineWidth = 2;
   ctx.stroke();
 
-  // Apex finial ornament
-  drawFourPointStar(ctx, cx, topY - 16, 14 * p, 0.9, THEME.goldBright);
+  // Top studio specular highlight edge
+  const spec = ctx.createLinearGradient(x + 24, y, x + w - 24, y);
+  spec.addColorStop(0, rgba('#FFFFFF', 0));
+  spec.addColorStop(0.5, rgba(accent, 0.8));
+  spec.addColorStop(1, rgba('#FFFFFF', 0));
+  ctx.strokeStyle = spec;
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  ctx.moveTo(x + 28, y + 1.5);
+  ctx.lineTo(x + w - 28, y + 1.5);
+  ctx.stroke();
+
+  if (headerLabel) {
+    ctx.fillStyle = rgba(accent, 0.1);
+    ctx.beginPath();
+    ctx.moveTo(x + radius, y);
+    ctx.lineTo(x + w - radius, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + radius);
+    ctx.lineTo(x + w, y + 52);
+    ctx.lineTo(x, y + 52);
+    ctx.lineTo(x, y + radius);
+    ctx.quadraticCurveTo(x, y, x + radius, y);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.strokeStyle = rgba(accent, 0.25);
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(x, y + 52);
+    ctx.lineTo(x + w, y + 52);
+    ctx.stroke();
+
+    ctx.font = '700 22px JetBrains';
+    ctx.fillStyle = headerColor;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(headerLabel, x + w / 2, y + 27);
+  }
+  ctx.restore();
+}
+
+export function drawCalloutLeader(ctx, x1, y1, x2, y2, label, accent = THEME.goldBright, progress = 1, align = 'left') {
+  const p = easeOutCubic(clamp01(progress));
+  if (p <= 0.02) return;
+  ctx.save();
+  const elbowX = lerp(x1, x2, 0.45);
+  const seg1P = clamp01(p * 2);
+  const seg2P = clamp01((p - 0.35) / 0.5);
+  const labelP = clamp01((p - 0.55) / 0.45);
+
+  // Anchor dot
+  ctx.fillStyle = accent;
+  ctx.beginPath();
+  ctx.arc(x1, y1, 6 * clamp01(p * 3), 0, TAU);
+  ctx.fill();
+  ctx.strokeStyle = rgba(accent, 0.4);
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(x1, y1, 12 * clamp01(p * 2.5), 0, TAU);
+  ctx.stroke();
+
+  // Elbow trace
+  ctx.strokeStyle = accent;
+  ctx.lineWidth = 2.5;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(lerp(x1, elbowX, seg1P), lerp(y1, y2, seg1P));
+  if (seg2P > 0) {
+    ctx.lineTo(lerp(elbowX, x2, seg2P), y2);
+  }
+  ctx.stroke();
+
+  if (labelP > 0.02 && label) {
+    ctx.globalAlpha = labelP;
+    ctx.font = '700 22px JetBrains';
+    const tw = ctx.measureText(label).width;
+    const pw = tw + 30;
+    const ph = 42;
+    const px = align === 'right' ? x2 - pw : align === 'center' ? x2 - pw / 2 : x2;
+    roundRectPath(ctx, px, y2 - ph / 2, pw, ph, 10);
+    ctx.fillStyle = 'rgba(8, 22, 19, 0.94)';
+    ctx.fill();
+    ctx.strokeStyle = rgba(accent, 0.75);
+    ctx.lineWidth = 1.8;
+    ctx.stroke();
+    ctx.fillStyle = accent;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(label, px + pw / 2, y2 + 1);
+  }
   ctx.restore();
 }
 
 // ============================================================================
-// 6. LATAR BELAKANG ATMOSFERIK, CAHAYA VOLUMETRIK & PARTIKEL
+// 5. CLEAN ARCHITECTURAL STAGE BACKDROP (ZERO PARTICLE CLUTTER)
 // ============================================================================
 
-let cachedGrainCanvas = null;
+const stageCache = new Map();
 
-function getGrainCanvas() {
-  if (cachedGrainCanvas) return cachedGrainCanvas;
-  const gw = 360;
-  const gh = 640;
-  const c = new Canvas(gw, gh);
-  const gctx = c.getContext('2d');
-  const img = gctx.createImageData(gw, gh);
-  const rnd = mulberry32(9091);
-  for (let i = 0; i < img.data.length; i += 4) {
-    const v = Math.floor(rnd() * 255);
-    img.data[i] = v;
-    img.data[i + 1] = v;
-    img.data[i + 2] = v;
-    img.data[i + 3] = 15;
-  }
-  gctx.putImageData(img, 0, 0);
-  cachedGrainCanvas = c;
-  return c;
-}
+function getCachedStageCanvas(paletteName) {
+  const key = paletteName || 'emerald';
+  if (stageCache.has(key)) return stageCache.get(key);
+  const pal = STAGE_PALETTES[key] || STAGE_PALETTES.emerald;
 
-const backdropCache = new Map();
-const rosetteSpriteCache = new Map();
-const orbSpriteCache = new Map();
-const latticeCache = new Map();
-const dustDotCache = new Map();
-
-function getOrbSprite(colorHex, innerAlpha, midAlpha, radius) {
-  const key = `${colorHex}_${innerAlpha}_${midAlpha}_${radius}`;
-  if (orbSpriteCache.has(key)) return orbSpriteCache.get(key);
-  const size = radius * 2;
-  const c = new Canvas(size, size);
-  const gctx = c.getContext('2d');
-  const grad = gctx.createRadialGradient(radius, radius, 10, radius, radius, radius);
-  grad.addColorStop(0, rgba(colorHex, innerAlpha));
-  grad.addColorStop(0.5, rgba(colorHex, midAlpha));
-  grad.addColorStop(1, rgba(colorHex, 0));
-  gctx.fillStyle = grad;
-  gctx.fillRect(0, 0, size, size);
-  orbSpriteCache.set(key, c);
-  return c;
-}
-
-function getDustDotSprite(tint) {
-  if (dustDotCache.has(tint)) return dustDotCache.get(tint);
-  const s = 48;
-  const c = new Canvas(s, s);
-  const gctx = c.getContext('2d');
-  const grad = gctx.createRadialGradient(s / 2, s / 2, 0, s / 2, s / 2, s / 2);
-  grad.addColorStop(0, rgba(tint, 1));
-  grad.addColorStop(0.45, rgba(tint, 0.35));
-  grad.addColorStop(1, rgba(tint, 0));
-  gctx.fillStyle = grad;
-  gctx.fillRect(0, 0, s, s);
-  dustDotCache.set(tint, c);
-  return c;
-}
-
-function getStaticBackdropCanvas(accentTop, accentGlow, turqGlow, mihrabAlpha) {
-  const key = `${accentTop}_${accentGlow}_${turqGlow}_${mihrabAlpha}`;
-  if (backdropCache.has(key)) return backdropCache.get(key);
   const c = new Canvas(WIDTH, HEIGHT);
   const bctx = c.getContext('2d');
-  const baseGrad = bctx.createLinearGradient(0, 0, 0, HEIGHT);
-  baseGrad.addColorStop(0, THEME.bgObsidian);
-  baseGrad.addColorStop(0.35, accentTop);
-  baseGrad.addColorStop(0.75, THEME.bgEmeraldDeep);
-  baseGrad.addColorStop(1, THEME.bgObsidian);
-  bctx.fillStyle = baseGrad;
+
+  // 1. Studio dark architectural gradient
+  const grad = bctx.createLinearGradient(0, 0, 0, HEIGHT);
+  grad.addColorStop(0, pal.bot);
+  grad.addColorStop(0.28, pal.top);
+  grad.addColorStop(0.68, pal.mid);
+  grad.addColorStop(1, pal.bot);
+  bctx.fillStyle = grad;
   bctx.fillRect(0, 0, WIDTH, HEIGHT);
 
-  // Subtle baked atmospheric aurora glows
-  const g1 = bctx.createRadialGradient(WIDTH * 0.5, HEIGHT * 0.28, 20, WIDTH * 0.5, HEIGHT * 0.28, 860);
-  g1.addColorStop(0, rgba(accentGlow, 0.16));
-  g1.addColorStop(0.5, rgba(accentGlow, 0.05));
-  g1.addColorStop(1, rgba(accentGlow, 0));
-  bctx.fillStyle = g1;
+  // 2. Soft centered studio key-light dome (no noisy orbs)
+  const keyLight = bctx.createRadialGradient(WIDTH * 0.5, HEIGHT * 0.42, 40, WIDTH * 0.5, HEIGHT * 0.42, 980);
+  keyLight.addColorStop(0, rgba(pal.key, 0.12));
+  keyLight.addColorStop(0.55, rgba(pal.rim, 0.05));
+  keyLight.addColorStop(1, rgba(pal.bot, 0));
+  bctx.fillStyle = keyLight;
   bctx.fillRect(0, 0, WIDTH, HEIGHT);
 
-  const g2 = bctx.createRadialGradient(WIDTH * 0.42, HEIGHT * 0.68, 20, WIDTH * 0.42, HEIGHT * 0.68, 920);
-  g2.addColorStop(0, rgba(turqGlow, 0.14));
-  g2.addColorStop(0.55, rgba(turqGlow, 0.04));
-  g2.addColorStop(1, rgba(turqGlow, 0));
-  bctx.fillStyle = g2;
-  bctx.fillRect(0, 0, WIDTH, HEIGHT);
-
-  if (mihrabAlpha > 0) {
-    drawMihrabArch(bctx, WIDTH * 0.5, 210, 1280, 2120, 1, mihrabAlpha);
+  // 3. Subtle architectural drafting grid (masked smoothly at edges)
+  bctx.save();
+  const step = 96;
+  bctx.lineWidth = 1;
+  bctx.strokeStyle = rgba(pal.rim, 0.065);
+  bctx.beginPath();
+  for (let x = 96; x < WIDTH; x += step) {
+    bctx.moveTo(x, 220);
+    bctx.lineTo(x, HEIGHT - 220);
   }
+  for (let y = 260; y < HEIGHT - 220; y += step) {
+    bctx.moveTo(72, y);
+    bctx.lineTo(WIDTH - 72, y);
+  }
+  bctx.stroke();
 
-  // Baked edge vignette for clean cinematic framing
-  const vig = bctx.createRadialGradient(WIDTH / 2, HEIGHT * 0.46, WIDTH * 0.38, WIDTH / 2, HEIGHT * 0.5, HEIGHT * 0.72);
+  // Stronger major grid axes every 384px
+  bctx.strokeStyle = rgba(pal.key, 0.075);
+  bctx.beginPath();
+  for (let x = 144; x < WIDTH; x += step * 4) {
+    bctx.moveTo(x, 220);
+    bctx.lineTo(x, HEIGHT - 220);
+  }
+  for (let y = 548; y < HEIGHT - 220; y += step * 4) {
+    bctx.moveTo(72, y);
+    bctx.lineTo(WIDTH - 72, y);
+  }
+  bctx.stroke();
+  bctx.restore();
+
+  // 4. Crisp architectural outer frame & registration ticks
+  bctx.save();
+  bctx.strokeStyle = rgba(pal.key, 0.18);
+  bctx.lineWidth = 1.5;
+  roundRectPath(bctx, 42, 42, WIDTH - 84, HEIGHT - 84, 34);
+  bctx.stroke();
+  drawRegistrationMark(bctx, 74, 248, 8, pal.key, 0.4);
+  drawRegistrationMark(bctx, WIDTH - 74, 248, 8, pal.key, 0.4);
+  drawRegistrationMark(bctx, 74, 2005, 8, pal.key, 0.4);
+  drawRegistrationMark(bctx, WIDTH - 74, 2005, 8, pal.key, 0.4);
+  bctx.restore();
+
+  // 5. Clean radial edge vignette
+  const vig = bctx.createRadialGradient(WIDTH / 2, HEIGHT * 0.48, WIDTH * 0.36, WIDTH / 2, HEIGHT * 0.5, HEIGHT * 0.72);
   vig.addColorStop(0, 'rgba(0,0,0,0)');
-  vig.addColorStop(0.7, 'rgba(2, 8, 7, 0.18)');
-  vig.addColorStop(1, 'rgba(1, 5, 4, 0.55)');
+  vig.addColorStop(0.75, 'rgba(2, 6, 6, 0.20)');
+  vig.addColorStop(1, 'rgba(1, 3, 3, 0.58)');
   bctx.fillStyle = vig;
   bctx.fillRect(0, 0, WIDTH, HEIGHT);
 
-  backdropCache.set(key, c);
+  stageCache.set(key, c);
   return c;
 }
 
-function getRosetteSprite(rosetteAlpha) {
-  const key = `${rosetteAlpha}`;
-  if (rosetteSpriteCache.has(key)) return rosetteSpriteCache.get(key);
-  const size = 1280;
-  const c = new Canvas(size, size);
-  const rctx = c.getContext('2d');
-  drawGirihRosette(rctx, size / 2, size / 2, 580, 12, 0, 1, {
-    strokeColor: rgba(THEME.goldMedina, rosetteAlpha),
-    accentColor: rgba(THEME.turqBright, rosetteAlpha * 0.7),
-    alpha: 1,
-    lineWidth: 1.8,
-    glow: false,
-    innerDetail: true,
-  });
-  rosetteSpriteCache.set(key, c);
-  return c;
-}
+export function drawArchitecturalStage(ctx, totalT, paletteName = 'emerald') {
+  const base = getCachedStageCanvas(paletteName);
+  ctx.drawImage(base, 0, 0);
 
-function getLatticeSprite(alpha, scale) {
-  const key = `${alpha}_${scale}`;
-  if (latticeCache.has(key)) return latticeCache.get(key);
-  const w = WIDTH + scale * 2;
-  const h = HEIGHT + scale * 2;
-  const c = new Canvas(w, h);
-  const lctx = c.getContext('2d');
-  lctx.globalAlpha = alpha;
-  lctx.strokeStyle = THEME.goldMedina;
-  lctx.lineWidth = 1.2;
-  const r = scale * 0.36;
-  lctx.beginPath();
-  for (let gx = scale * 0.5; gx < w; gx += scale) {
-    for (let gy = scale * 0.5; gy < h; gy += scale) {
-      lctx.moveTo(gx, gy - r);
-      lctx.lineTo(gx + r, gy);
-      lctx.lineTo(gx, gy + r);
-      lctx.lineTo(gx - r, gy);
-      lctx.closePath();
-      const cr = r * 0.32;
-      lctx.moveTo(gx + cr, gy);
-      lctx.arc(gx, gy, cr, 0, TAU);
-    }
-  }
-  lctx.stroke();
-  latticeCache.set(key, c);
-  return c;
-}
-
-export function drawMashrabiyaLattice(ctx, t, alpha = 0.06, scale = 140) {
-  const sprite = getLatticeSprite(alpha, scale);
-  const driftX = ((t * 9) % scale + scale) % scale;
-  const driftY = ((t * 6) % scale + scale) % scale;
-  ctx.drawImage(sprite, driftX - scale, driftY - scale);
-}
-
-export function drawVolumetricRays(ctx, t, originX = WIDTH * 0.5, originY = -120, rayCount = 5, intensity = 0.22, colorHex = THEME.goldMedina) {
+  // Subtle horizontal stage horizon scan-glow (editorial studio polish, zero particles)
+  const pal = STAGE_PALETTES[paletteName] || STAGE_PALETTES.emerald;
   ctx.save();
-  const count = Math.min(rayCount, 5);
-  for (let i = 0; i < count; i++) {
-    const baseAngle = Math.PI * 0.5 + (i - (count - 1) / 2) * 0.16;
-    const sway = Math.sin(t * 0.42 + i * 1.37) * 0.045;
-    const angle = baseAngle + sway;
-    const spread = 0.055 + 0.025 * Math.sin(t * 0.65 + i);
-    const len = 2100;
-    const a1 = angle - spread;
-    const a2 = angle + spread;
-
-    const ex = originX + Math.cos(angle) * len * 0.85;
-    const ey = originY + Math.sin(angle) * len * 0.85;
-    const grad = ctx.createLinearGradient(originX, originY, ex, ey);
-    const pulse = 0.72 + 0.28 * Math.sin(t * 0.8 + i * 2.1);
-    grad.addColorStop(0, rgba(colorHex, intensity * pulse));
-    grad.addColorStop(0.45, rgba(colorHex, intensity * 0.32 * pulse));
-    grad.addColorStop(1, rgba(colorHex, 0));
-
-    ctx.fillStyle = grad;
-    ctx.beginPath();
-    ctx.moveTo(originX, originY);
-    ctx.lineTo(originX + Math.cos(a1) * len, originY + Math.sin(a1) * len);
-    ctx.lineTo(originX + Math.cos(a2) * len, originY + Math.sin(a2) * len);
-    ctx.closePath();
-    ctx.fill();
-  }
+  const scanY = 580 + Math.sin(totalT * 0.45) * 40;
+  const band = ctx.createLinearGradient(0, scanY - 120, 0, scanY + 120);
+  band.addColorStop(0, rgba(pal.key, 0));
+  band.addColorStop(0.5, rgba(pal.key, 0.045));
+  band.addColorStop(1, rgba(pal.key, 0));
+  ctx.fillStyle = band;
+  ctx.fillRect(44, scanY - 120, WIDTH - 88, 240);
   ctx.restore();
-}
-
-export function drawStarAndDustField(ctx, t, count = 65, seedBase = 101, tint = THEME.goldBright) {
-  const rnd = mulberry32(seedBase);
-  const dot = getDustDotSprite(tint);
-  ctx.save();
-  for (let i = 0; i < count; i++) {
-    const bx = rnd() * WIDTH;
-    const by = rnd() * HEIGHT;
-    const depth = 0.3 + rnd() * 0.9;
-    const speedY = 14 + rnd() * 26;
-    const speedX = (rnd() - 0.5) * 14;
-    const size = 1.4 + rnd() * 4.2 * depth;
-    const phase = rnd() * TAU;
-
-    const x = ((bx + t * speedX * depth + Math.sin(t * 0.7 + phase) * 22) % (WIDTH + 40) + WIDTH + 40) % (WIDTH + 40) - 20;
-    const y = ((by - t * speedY * depth) % (HEIGHT + 40) + HEIGHT + 40) % (HEIGHT + 40) - 20;
-
-    const twinkle = 0.3 + 0.7 * (0.5 + 0.5 * Math.sin(t * (1.8 + rnd() * 2.4) + phase));
-    const edgeFade = smoothstep(0, 160, y) * smoothstep(HEIGHT, HEIGHT - 160, y);
-    const alpha = twinkle * edgeFade * (0.32 + 0.45 * depth);
-
-    if (i % 7 === 0) {
-      drawFourPointStar(ctx, x, y, size * 2.2, alpha * 0.9, tint, t * 0.4 + phase);
-    } else {
-      const d = size * 5;
-      ctx.globalAlpha = alpha;
-      ctx.drawImage(dot, x - d / 2, y - d / 2, d, d);
-    }
-  }
-  ctx.restore();
-}
-
-export function drawCosmicBackdrop(ctx, totalT, sceneIndex, options = {}) {
-  const {
-    accentTop = THEME.bgEmeraldMid,
-    accentGlow = THEME.goldMedina,
-    turqGlow = THEME.turqMid,
-    rayIntensity = 0.2,
-    latticeAlpha = 0.055,
-    mihrabAlpha = 0.25,
-    rosetteAlpha = 0.14,
-  } = options;
-
-  // 1, 2 & 5. Cached opaque emerald-obsidian gradient + aurora + Mihrab frame + vignette
-  const staticBg = getStaticBackdropCanvas(accentTop, accentGlow, turqGlow, mihrabAlpha);
-  ctx.drawImage(staticBg, 0, 0);
-
-  // 3. Lightweight Mashrabiya lattice drift (single batched stroke)
-  if (latticeAlpha > 0) {
-    ctx.save();
-    ctx.globalAlpha = latticeAlpha;
-    ctx.strokeStyle = THEME.goldMedina;
-    ctx.lineWidth = 1.2;
-    const scale = 220;
-    const driftX = ((totalT * 9) % scale + scale) % scale;
-    const driftY = ((totalT * 6) % scale + scale) % scale;
-    const r = scale * 0.34;
-    ctx.beginPath();
-    for (let gx = -scale * 0.5; gx < WIDTH + scale; gx += scale) {
-      for (let gy = -scale * 0.5; gy < HEIGHT + scale; gy += scale) {
-        const cx = gx + driftX;
-        const cy = gy + driftY;
-        ctx.moveTo(cx, cy - r);
-        ctx.lineTo(cx + r, cy);
-        ctx.lineTo(cx, cy + r);
-        ctx.lineTo(cx - r, cy);
-        ctx.closePath();
-      }
-    }
-    ctx.stroke();
-    ctx.restore();
-  }
-
-  // 4. Crisp rotating background Girih watermark rosette (single vector batch, zero large bitmap composite)
-  if (rosetteAlpha > 0) {
-    drawGirihRosette(ctx, WIDTH * 0.5, HEIGHT * 0.45, 580, 12, totalT * 0.035, 1, {
-      strokeColor: rgba(THEME.goldMedina, rosetteAlpha),
-      accentColor: rgba(THEME.turqBright, rosetteAlpha * 0.7),
-      alpha: 1,
-      lineWidth: 1.8,
-      glow: false,
-      innerDetail: false,
-    });
-  }
-
-  // 6. Volumetric golden light shafts
-  if (rayIntensity > 0) {
-    drawVolumetricRays(ctx, totalT, WIDTH * 0.5, -140, 5, rayIntensity, accentGlow);
-  }
-
-  // 7. Floating dust motes & stars
-  drawStarAndDustField(ctx, totalT, 48, 300 + sceneIndex * 19, THEME.goldBright);
 }
 
 // ============================================================================
-// 7. SISTEM TIPOGRAFI, HUD, ARABIC PLAQUE & KINETIC CAPTIONS
+// 6. EDITORIAL HUD, HEADLINE, ARABIC PLAQUE & BROADCAST CAPTIONS
 // ============================================================================
 
 export function drawTopHUD(ctx, scene, localT) {
-  const enter = easeOutExpo(clamp01(localT / 0.55));
+  const enter = easeOutCubic(clamp01(localT / 0.45));
   ctx.save();
   ctx.globalAlpha = enter;
 
-  // Left: Brand Emblem + @MuhammadAtarzk
+  // Left: Brand Emblem + Handle
   const bx = 84;
   const by = 92;
-  drawRubElHizb(ctx, bx + 20, by, 20, localT * 0.35, THEME.goldMedina, 2.2, rgba(THEME.goldMedina, 0.18));
-  drawFourPointStar(ctx, bx + 20, by, 7, 0.95, THEME.goldBright);
-
-  ctx.font = '700 28px Jakarta';
+  drawRubElHizbBadge(ctx, bx + 20, by, 18, localT * 0.25, THEME.goldMedina, 2, rgba(THEME.goldMedina, 0.16));
+  ctx.font = '700 27px Jakarta';
   ctx.fillStyle = THEME.ivory;
   ctx.textAlign = 'left';
   ctx.textBaseline = 'middle';
   ctx.fillText(VIDEO_CONFIG.channelHandle, bx + 54, by + 1);
 
-  // Right: Category Pill
-  ctx.font = '600 22px JetBrains';
-  const catText = VIDEO_CONFIG.categoryLabel;
-  const catW = ctx.measureText(catText).width + 44;
-  const catX = WIDTH - 84 - catW;
-  const catY = by - 23;
-  roundRectPath(ctx, catX, catY, catW, 46, 23);
-  ctx.fillStyle = THEME.glassDark;
+  // Right: Category Tag
+  ctx.font = '700 21px JetBrains';
+  const catW = ctx.measureText(VIDEO_CONFIG.categoryLabel).width + 44;
+  roundRectPath(ctx, WIDTH - 84 - catW, by - 21, catW, 42, 21);
+  ctx.fillStyle = 'rgba(9, 25, 22, 0.86)';
   ctx.fill();
-  ctx.strokeStyle = rgba(THEME.turqBright, 0.35);
+  ctx.strokeStyle = rgba(THEME.turqBright, 0.42);
   ctx.lineWidth = 1.5;
   ctx.stroke();
-
   ctx.fillStyle = THEME.turqBright;
   ctx.textAlign = 'center';
-  ctx.fillText(catText, catX + catW / 2, by + 1);
+  ctx.fillText(VIDEO_CONFIG.categoryLabel, WIDTH - 84 - catW / 2, by + 1);
 
-  // Center Chapter Banner
-  const chapY = 205 - (1 - enter) * 18;
-  const chapLabel = `${scene.chapter}  ·  ${scene.badge}`;
-  ctx.font = '700 24px JetBrains';
-  const cw = ctx.measureText(chapLabel).width + 54;
-  const wingLen = 180;
+  // Editorial Chapter Indicator Bar
+  const chapY = 178;
+  const chapText = `${scene.chapter}  ·  ${scene.badge}`;
+  ctx.font = '700 23px JetBrains';
+  const cw = ctx.measureText(chapText).width + 58;
 
-  // Tapered gold wings
-  const leftWing = ctx.createLinearGradient(WIDTH / 2 - cw / 2 - wingLen, chapY, WIDTH / 2 - cw / 2, chapY);
-  leftWing.addColorStop(0, rgba(THEME.goldMedina, 0));
-  leftWing.addColorStop(1, rgba(THEME.goldMedina, 0.8));
-  ctx.strokeStyle = leftWing;
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(WIDTH / 2 - cw / 2 - wingLen, chapY);
-  ctx.lineTo(WIDTH / 2 - cw / 2 - 14, chapY);
-  ctx.stroke();
+  // Flanking editorial hairlines
+  const lineLen = 190 * enter;
+  drawStrokeLine(ctx, WIDTH / 2 - cw / 2 - 20 - lineLen, chapY, WIDTH / 2 - cw / 2 - 20, chapY, rgba(THEME.goldMedina, 0.45), 1.5);
+  drawStrokeLine(ctx, WIDTH / 2 + cw / 2 + 20, chapY, WIDTH / 2 + cw / 2 + 20 + lineLen, chapY, rgba(THEME.goldMedina, 0.45), 1.5);
 
-  const rightWing = ctx.createLinearGradient(WIDTH / 2 + cw / 2, chapY, WIDTH / 2 + cw / 2 + wingLen, chapY);
-  rightWing.addColorStop(0, rgba(THEME.goldMedina, 0.8));
-  rightWing.addColorStop(1, rgba(THEME.goldMedina, 0));
-  ctx.strokeStyle = rightWing;
-  ctx.beginPath();
-  ctx.moveTo(WIDTH / 2 + cw / 2 + 14, chapY);
-  ctx.lineTo(WIDTH / 2 + cw / 2 + wingLen, chapY);
-  ctx.stroke();
-
-  roundRectPath(ctx, WIDTH / 2 - cw / 2, chapY - 24, cw, 48, 24);
-  ctx.fillStyle = rgba(THEME.goldMedina, 0.16);
+  roundRectPath(ctx, WIDTH / 2 - cw / 2, chapY - 22, cw, 44, 12);
+  ctx.fillStyle = 'rgba(9, 22, 19, 0.92)';
   ctx.fill();
-  ctx.strokeStyle = rgba(THEME.goldMedina, 0.65);
-  ctx.lineWidth = 1.8;
+  ctx.strokeStyle = rgba(THEME.goldMedina, 0.55);
+  ctx.lineWidth = 1.6;
   ctx.stroke();
 
   ctx.fillStyle = THEME.goldBright;
   ctx.textAlign = 'center';
-  ctx.fillText(chapLabel, WIDTH / 2, chapY + 1);
+  ctx.fillText(chapText, WIDTH / 2, chapY + 1);
 
   ctx.restore();
 }
 
 export function drawKineticHeadline(ctx, scene, localT) {
-  const maxW = 1220;
-  const fontSize = 68;
-  const lineHeight = 86;
-  ctx.save();
-  ctx.font = `800 ${fontSize}px Jakarta`;
-  ctx.textBaseline = 'middle';
+  const words = scene.headline.split(' ');
+  const hlSet = new Set((scene.highlightWords || []).flatMap((hw) => hw.toUpperCase().split(' ')));
 
-  const rawWords = scene.headline.split(' ');
+  ctx.save();
+  const fontSize = words.length > 7 ? 56 : 62;
+  ctx.font = `800 ${fontSize}px Jakarta`;
+  const maxW = 1220;
   const lines = [];
-  let current = '';
-  for (const w of rawWords) {
-    const test = current ? `${current} ${w}` : w;
-    if (ctx.measureText(test).width > maxW && current) {
-      lines.push(current);
-      current = w;
+  let line = '';
+  for (const w of words) {
+    const test = line ? `${line} ${w}` : w;
+    if (ctx.measureText(test).width > maxW && line) {
+      lines.push(line);
+      line = w;
     } else {
-      current = test;
+      line = test;
     }
   }
-  if (current) lines.push(current);
+  if (line) lines.push(line);
 
-  const highlightPhrases = (scene.highlightWords || []).map((s) => s.toUpperCase());
-  const startY = 315 + (lines.length === 1 ? 35 : lines.length === 2 ? 15 : 0);
+  const lineH = fontSize + 20;
+  const startY = lines.length === 1 ? 316 : 292;
+  const wipeP = easeOutQuart(clamp01((localT - 0.18) / 0.55));
 
-  lines.forEach((line, li) => {
-    const delay = 0.06 + li * 0.09;
-    const p = easeOutExpo(clamp01((localT - delay) / 0.45));
-    const y = startY + li * lineHeight + (1 - p) * 28;
-    const lineW = ctx.measureText(line).width;
-    let cursorX = (WIDTH - lineW) / 2;
+  lines.forEach((ln, li) => {
+    const lp = easeOutExpo(clamp01((localT - li * 0.08) / 0.42));
+    const y = startY + li * lineH + (1 - lp) * 24;
+    ctx.save();
+    ctx.globalAlpha = lp;
+    ctx.font = `800 ${fontSize}px Jakarta`;
+    ctx.textBaseline = 'middle';
 
-    ctx.globalAlpha = p;
+    const lineWords = ln.split(' ');
+    const spaceW = ctx.measureText(' ').width;
+    const widths = lineWords.map((w) => ctx.measureText(w).width);
+    const totalW = widths.reduce((a, b) => a + b, 0) + spaceW * (lineWords.length - 1);
+    let cx = WIDTH / 2 - totalW / 2;
 
-    // Identify highlight spans inside this line (full-height rounded pill!)
-    const upperLine = line.toUpperCase();
-    const spans = [];
-    for (const phrase of highlightPhrases) {
-      let idx = upperLine.indexOf(phrase);
-      while (idx !== -1) {
-        spans.push([idx, idx + phrase.length]);
-        idx = upperLine.indexOf(phrase, idx + phrase.length);
-      }
-    }
+    lineWords.forEach((w, wi) => {
+      const cleanW = w.replace(/[^A-Z0-9-]/gi, '').toUpperCase();
+      const isHL = hlSet.has(cleanW);
+      const ww = widths[wi];
 
-    // Draw highlight pills first behind text
-    for (const [s0, s1] of spans) {
-      const before = line.slice(0, s0);
-      const target = line.slice(s0, s1);
-      const x0 = cursorX + ctx.measureText(before).width;
-      const wTarget = ctx.measureText(target).width;
-      const sweep = easeOutExpo(clamp01((localT - delay - 0.14) / 0.42));
-
-      const padX = 18;
-      const pillH = 74;
-      const pillW = (wTarget + padX * 2) * sweep;
-
-      if (pillW > 4) {
-        roundRectPath(ctx, x0 - padX, y - pillH / 2 - 2, pillW, pillH, 16);
-        const pillGrad = ctx.createLinearGradient(x0 - padX, y - 35, x0 + wTarget + padX, y + 35);
-        pillGrad.addColorStop(0, THEME.goldMedina);
-        pillGrad.addColorStop(1, THEME.goldBright);
-        ctx.fillStyle = pillGrad;
-        ctx.shadowColor = rgba(THEME.goldMedina, 0.45);
-        ctx.shadowBlur = 22;
-        ctx.fill();
-        ctx.shadowBlur = 0;
-      }
-    }
-
-    // Draw line characters segment-by-segment so highlighted words turn deep obsidian
-    spans.sort((a, b) => a[0] - b[0]);
-    let pos = 0;
-    const segments = [];
-    for (const [s0, s1] of spans) {
-      if (s0 > pos) segments.push({ text: line.slice(pos, s0), hi: false });
-      segments.push({ text: line.slice(s0, s1), hi: true });
-      pos = s1;
-    }
-    if (pos < line.length) segments.push({ text: line.slice(pos), hi: false });
-
-    ctx.textAlign = 'left';
-    for (const seg of segments) {
-      const sw = ctx.measureText(seg.text).width;
-      if (seg.hi) {
-        const sweep = clamp01((localT - delay - 0.14) / 0.35);
-        ctx.fillStyle = sweep > 0.45 ? THEME.bgObsidian : THEME.ivory;
-        ctx.fillText(seg.text, cursorX, y);
+      if (isHL) {
+        // Editorial gold highlighter sweep under + behind keyword
+        const padX = 12;
+        const boxW = (ww + padX * 2) * wipeP;
+        if (boxW > 4) {
+          roundRectPath(ctx, cx - padX, y - fontSize * 0.54, boxW, fontSize * 1.08, 12);
+          const g = ctx.createLinearGradient(cx - padX, y - 30, cx - padX + ww + padX * 2, y + 30);
+          g.addColorStop(0, THEME.goldBright);
+          g.addColorStop(1, THEME.goldMedina);
+          ctx.fillStyle = g;
+          ctx.fill();
+        }
+        ctx.fillStyle = wipeP > 0.35 ? THEME.bgObsidian : THEME.ivory;
       } else {
-        ctx.shadowColor = 'rgba(0,0,0,0.65)';
-        ctx.shadowBlur = 12;
         ctx.fillStyle = THEME.ivory;
-        ctx.fillText(seg.text, cursorX, y);
-        ctx.shadowBlur = 0;
       }
-      cursorX += sw;
-    }
+      ctx.textAlign = 'left';
+      ctx.fillText(w, cx, y);
+      cx += ww + spaceW;
+    });
+    ctx.restore();
   });
 
+  // Subtle divider bar beneath headline
+  const divY = startY + lines.length * lineH + 8;
+  const divW = 240 * easeOutCubic(clamp01(localT / 0.55));
+  drawStrokeLine(ctx, WIDTH / 2 - divW / 2, divY, WIDTH / 2 + divW / 2, divY, rgba(THEME.goldMedina, 0.45), 2);
   ctx.restore();
 }
 
-export function drawArabicPlaque(ctx, scene, cx, cy, maxW = 1140, localT = 1, opts = {}) {
-  const { delay = 0.25, arabicSize = 54, showTrans = true, alpha = 1 } = opts;
-  const p = easeOutExpo(clamp01((localT - delay) / 0.55));
-  if (p <= 0.01) return;
+export function drawArabicPlaque(ctx, scene, cx, cy, maxW, localT, opts = {}) {
+  const { delay = 0.6, arabicSize = 48, showTrans = true } = opts;
+  const p = easeOutExpo(clamp01((localT - delay) / 0.6));
+  if (p <= 0.01 || !scene.arabic) return;
 
   ctx.save();
-  ctx.globalAlpha = p * alpha;
-  const yShift = (1 - p) * 22;
+  ctx.globalAlpha = p;
+  const yShift = (1 - p) * 20;
 
-  ctx.font = `700 ${arabicSize}px Amiri`;
+  let fittedArSize = arabicSize;
+  ctx.font = `700 ${fittedArSize}px Amiri`;
+  while (ctx.measureText(scene.arabic).width > maxW - 110 && fittedArSize > 32) {
+    fittedArSize -= 2;
+    ctx.font = `700 ${fittedArSize}px Amiri`;
+  }
   const arW = ctx.measureText(scene.arabic).width;
 
-  // Measure and wrap translation cleanly so zero characters ever clip
   const transText = scene.arabicTrans ? `"${scene.arabicTrans}"` : '';
-  ctx.font = 'italic 600 25px Playfair';
+  ctx.font = 'italic 600 24px Playfair';
   const targetMaxTextW = Math.min(maxW - 110, 1020);
   const transLines = [];
   if (showTrans && transText) {
@@ -1026,113 +652,74 @@ export function drawArabicPlaque(ctx, scene, cx, cy, maxW = 1140, localT = 1, op
     if (cur) transLines.push(cur);
   }
   const widestTrans = transLines.reduce((m, l) => Math.max(m, ctx.measureText(l).width), 0);
-  const boxW = Math.max(680, Math.min(maxW, Math.max(arW, widestTrans) + 140));
-  const extraH = transLines.length > 1 ? (transLines.length - 1) * 34 : 0;
-  const boxH = (showTrans ? 196 : 124) + extraH;
+  const boxW = Math.max(660, Math.min(maxW, Math.max(arW, widestTrans) + 140));
+  const extraH = transLines.length > 1 ? (transLines.length - 1) * 32 : 0;
+  const boxH = (showTrans ? 186 : 118) + extraH;
   const bx = cx - boxW / 2;
   const by = cy - boxH / 2 + yShift;
 
-  // Frosted emerald plaque with gold border
-  roundRectPath(ctx, bx, by, boxW, boxH, 28);
-  const bg = ctx.createLinearGradient(bx, by, bx, by + boxH);
-  bg.addColorStop(0, 'rgba(9, 32, 27, 0.90)');
-  bg.addColorStop(1, 'rgba(4, 15, 13, 0.94)');
-  ctx.fillStyle = bg;
-  ctx.shadowColor = 'rgba(0,0,0,0.5)';
-  ctx.shadowBlur = 28;
+  drawBevelCard(ctx, bx, by, boxW, boxH, {
+    radius: 22,
+    accent: THEME.goldMedina,
+    bgTop: 'rgba(10, 26, 22, 0.94)',
+    bgBot: 'rgba(5, 14, 12, 0.97)',
+    borderAlpha: 0.55,
+  });
+
+  // Left vertical gold accent spine
+  roundRectPath(ctx, bx + 16, by + 20, 5, boxH - 40, 3);
+  ctx.fillStyle = THEME.goldMedina;
   ctx.fill();
-  ctx.shadowBlur = 0;
 
-  ctx.strokeStyle = rgba(THEME.goldMedina, 0.55);
-  ctx.lineWidth = 2;
-  ctx.stroke();
-
-  // Inner filigree border
-  roundRectPath(ctx, bx + 10, by + 10, boxW - 20, boxH - 20, 20);
-  ctx.strokeStyle = rgba(THEME.goldBright, 0.18);
-  ctx.lineWidth = 1;
-  ctx.stroke();
-
-  // Corner diamonds
-  drawFourPointStar(ctx, bx + 26, by + 26, 7, 0.75, THEME.goldMedina);
-  drawFourPointStar(ctx, bx + boxW - 26, by + 26, 7, 0.75, THEME.goldMedina);
-  drawFourPointStar(ctx, bx + 26, by + boxH - 26, 7, 0.75, THEME.goldMedina);
-  drawFourPointStar(ctx, bx + boxW - 26, by + boxH - 26, 7, 0.75, THEME.goldMedina);
-
-  // Arabic script (auto-scaled if wider than plaque)
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillStyle = THEME.goldBright;
-  ctx.shadowColor = rgba(THEME.goldMedina, 0.45);
-  ctx.shadowBlur = 16;
-  let fittedArSize = arabicSize;
   ctx.font = `700 ${fittedArSize}px Amiri`;
-  while (ctx.measureText(scene.arabic).width > boxW - 90 && fittedArSize > 32) {
-    fittedArSize -= 2;
-    ctx.font = `700 ${fittedArSize}px Amiri`;
-  }
-  const arY = showTrans ? by + 66 : cy + yShift;
+  const arY = showTrans ? by + 62 : cy + yShift;
   ctx.fillText(scene.arabic, cx, arY);
-  ctx.shadowBlur = 0;
 
   if (showTrans && transLines.length > 0) {
-    // Divider hairline
-    const divGrad = ctx.createLinearGradient(cx - 220, 0, cx + 220, 0);
-    divGrad.addColorStop(0, rgba(THEME.goldMedina, 0));
-    divGrad.addColorStop(0.5, rgba(THEME.goldMedina, 0.6));
-    divGrad.addColorStop(1, rgba(THEME.goldMedina, 0));
-    ctx.strokeStyle = divGrad;
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.moveTo(cx - 220, by + 114);
-    ctx.lineTo(cx + 220, by + 114);
-    ctx.stroke();
-
-    ctx.font = 'italic 600 25px Playfair';
+    drawStrokeLine(ctx, cx - 180, by + 108, cx + 180, by + 108, rgba(THEME.goldMedina, 0.35), 1.5);
+    ctx.font = 'italic 600 24px Playfair';
     ctx.fillStyle = THEME.ivoryMuted;
     transLines.forEach((tl, li) => {
-      ctx.fillText(tl, cx, by + 150 + li * 34);
+      ctx.fillText(tl, cx, by + 142 + li * 32);
     });
   }
-
   ctx.restore();
 }
 
 export function drawBroadcastCaptions(ctx, scene, localT) {
-  const words = scene.words || [];
-  if (words.length === 0) return;
+  const words = scene.words;
+  if (!words || words.length === 0) return;
 
-  // Group words into rhythmic 4-5 word chunks
-  const chunkSize = 5;
   const chunks = [];
+  const chunkSize = 5;
   for (let i = 0; i < words.length; i += chunkSize) {
     const slice = words.slice(i, i + chunkSize);
     chunks.push({
       words: slice,
       start: slice[0].start,
-      end: slice[slice.length - 1].end,
+      end: slice[slice.length - 1].end + 0.2,
     });
   }
 
-  let activeChunk = chunks.find((c) => localT >= c.start - 0.05 && localT <= c.end + 0.16);
-  if (!activeChunk) {
-    if (localT < chunks[0].start) activeChunk = chunks[0];
-    else activeChunk = chunks[chunks.length - 1];
+  let activeChunk = chunks[0];
+  for (let i = 0; i < chunks.length; i++) {
+    if (localT >= chunks[i].start - 0.04) activeChunk = chunks[i];
   }
+  if (!activeChunk || localT > activeChunk.end + 0.55) return;
 
-  const chunkFadeIn = easeOutCubic(clamp01((localT - (activeChunk.start - 0.05)) / 0.16));
-  const cy = 2170;
-
+  const chunkAlpha = clamp01((localT - activeChunk.start + 0.12) / 0.12);
   ctx.save();
-  ctx.globalAlpha = chunkFadeIn;
-  ctx.font = '700 42px Jakarta';
-  ctx.textBaseline = 'middle';
+  ctx.globalAlpha = chunkAlpha;
 
-  // Split chunk into 1 or 2 balanced visual rows
-  const maxRowW = 1120;
+  const baseFont = '700 42px Jakarta';
+  ctx.font = baseFont;
+  const maxRowW = 1100;
   const rows = [[]];
   let rowW = 0;
-  const spaceW = 18;
+  const spaceW = 16;
   for (const wObj of activeChunk.words) {
     const ww = ctx.measureText(wObj.word).width;
     if (rows[rows.length - 1].length > 0 && rowW + spaceW + ww > maxRowW) {
@@ -1144,62 +731,50 @@ export function drawBroadcastCaptions(ctx, scene, localT) {
     }
   }
 
-  const rowWidths = rows.map((r) => {
-    const sum = r.reduce((acc, w) => acc + ctx.measureText(w.word).width, 0);
-    return sum + Math.max(0, r.length - 1) * spaceW;
+  const rowWidths = rows.map((row) => {
+    const sum = row.reduce((acc, wObj) => acc + ctx.measureText(wObj.word).width, 0);
+    return sum + Math.max(0, row.length - 1) * spaceW;
   });
-  const widest = Math.max(...rowWidths, 360);
-  const padX = 48;
-  const padY = 26;
-  const rowH = 58;
-  const boxW = widest + padX * 2;
-  const boxH = rows.length * rowH + padY * 2;
-  const bx = (WIDTH - boxW) / 2;
-  const by = cy - boxH / 2;
+  const widest = Math.max(...rowWidths, 280);
+  const pillW = Math.min(1240, widest + 80);
+  const pillH = rows.length === 1 ? 86 : 146;
+  const centerY = 2165;
+  const px = WIDTH / 2 - pillW / 2;
+  const py = centerY - pillH / 2;
 
-  // Frosted dark glass capsule
-  roundRectPath(ctx, bx, by, boxW, boxH, 28);
-  ctx.fillStyle = 'rgba(4, 14, 12, 0.86)';
-  ctx.shadowColor = 'rgba(0,0,0,0.55)';
-  ctx.shadowBlur = 24;
+  roundRectPath(ctx, px, py, pillW, pillH, 22);
+  ctx.fillStyle = 'rgba(4, 13, 11, 0.92)';
+  ctx.shadowColor = 'rgba(0,0,0,0.5)';
+  ctx.shadowBlur = 22;
   ctx.fill();
   ctx.shadowBlur = 0;
   ctx.strokeStyle = rgba(THEME.goldMedina, 0.35);
   ctx.lineWidth = 1.6;
   ctx.stroke();
 
-  // Render words with active gold highlight
-  rows.forEach((r, ri) => {
-    const rw = rowWidths[ri];
-    let wx = (WIDTH - rw) / 2;
-    const wy = by + padY + rowH * (ri + 0.5);
+  ctx.textBaseline = 'middle';
+  ctx.textAlign = 'left';
 
-    for (const wObj of r) {
+  rows.forEach((row, ri) => {
+    const ry = rows.length === 1 ? centerY : centerY - 30 + ri * 58;
+    let wx = WIDTH / 2 - rowWidths[ri] / 2;
+    row.forEach((wObj) => {
       const ww = ctx.measureText(wObj.word).width;
-      const isSpoken = localT >= wObj.start && localT <= wObj.end + 0.08;
-      const wasSpoken = localT > wObj.end + 0.08;
+      const isActive = localT >= wObj.start - 0.03 && localT <= wObj.end + 0.1;
+      const isSpoken = localT > wObj.end + 0.1;
 
-      ctx.save();
-      if (isSpoken) {
-        const pop = 1 + 0.06 * Math.sin(clamp01((localT - wObj.start) / Math.max(0.1, wObj.end - wObj.start)) * Math.PI);
-        ctx.translate(wx + ww / 2, wy);
-        ctx.scale(pop, pop);
-        ctx.font = '800 42px Jakarta';
+      if (isActive) {
+        roundRectPath(ctx, wx - 8, ry - 27, ww + 16, 54, 10);
+        ctx.fillStyle = rgba(THEME.goldBright, 0.16);
+        ctx.fill();
         ctx.fillStyle = THEME.goldBright;
-        ctx.shadowColor = rgba(THEME.goldMedina, 0.55);
-        ctx.shadowBlur = 14;
-        ctx.textAlign = 'center';
-        ctx.fillText(wObj.word, 0, 0);
       } else {
-        ctx.font = '700 42px Jakarta';
-        ctx.fillStyle = wasSpoken ? THEME.ivory : 'rgba(232, 228, 214, 0.72)';
-        ctx.textAlign = 'left';
-        ctx.fillText(wObj.word, wx, wy);
+        ctx.fillStyle = isSpoken ? THEME.ivory : 'rgba(210, 218, 214, 0.58)';
       }
-      ctx.restore();
-
+      ctx.font = baseFont;
+      ctx.fillText(wObj.word, wx, ry);
       wx += ww + spaceW;
-    }
+    });
   });
 
   ctx.restore();
@@ -1207,1072 +782,2028 @@ export function drawBroadcastCaptions(ctx, scene, localT) {
 
 export function drawSourceFooter(ctx, sourceText, localT) {
   if (!sourceText) return;
-  const p = easeOutCubic(clamp01((localT - 0.3) / 0.45));
+  const p = easeOutCubic(clamp01((localT - 0.35) / 0.5));
   ctx.save();
   ctx.globalAlpha = p * 0.9;
+  const txt = `SUMBER: ${sourceText}`;
   ctx.font = '600 22px JetBrains';
-  const label = `SUMBER: ${sourceText}`;
-  const tw = ctx.measureText(label).width + 44;
-  const fx = (WIDTH - tw) / 2;
-  const fy = 2385;
-
-  roundRectPath(ctx, fx, fy, tw, 44, 22);
-  ctx.fillStyle = 'rgba(6, 22, 18, 0.75)';
+  const w = Math.min(1260, ctx.measureText(txt).width + 52);
+  const y = 2385;
+  roundRectPath(ctx, WIDTH / 2 - w / 2, y - 20, w, 40, 12);
+  ctx.fillStyle = 'rgba(6, 17, 15, 0.85)';
   ctx.fill();
-  ctx.strokeStyle = rgba(THEME.turqBright, 0.28);
+  ctx.strokeStyle = rgba(THEME.slateText, 0.32);
   ctx.lineWidth = 1.2;
   ctx.stroke();
 
-  ctx.fillStyle = THEME.slateText;
+  ctx.fillStyle = THEME.ivoryMuted;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText(label, WIDTH / 2, fy + 23);
+  ctx.fillText(txt, WIDTH / 2, y + 1);
   ctx.restore();
 }
 
 // ============================================================================
-// 8. KOMPONEN VISUAL KHUSUS DOMAIN ISLAM & ANIMASI PROSEDURAL
+// 7. BESPOKE EXPLANATORY MOTION GRAPHICS & ILLUSTRATIONS (ZERO FILLER)
 // ============================================================================
 
-export function drawBigNumberCounter(ctx, cx, cy, valueText, subLabel, progress, opts = {}) {
-  const {
-    fontSize = 190,
-    colorTop = THEME.goldBright,
-    colorBot = THEME.goldBurnished,
-    glowColor = THEME.goldMedina,
-    echoTrails = true,
-  } = opts;
+/**
+ * x01: Human Math Calculator (1+1=2) morphing into Islamic Multiplication Matrix (1 -> 10x -> 100x -> 700x -> INF)
+ */
+export function drawHumanVsIslamicMath(ctx, cx, cy, localT, totalT) {
+  const morphP = easeInOutQuart(clamp01((localT - 4.2) / 1.4));
+  const enterP = easeOutExpo(clamp01(localT / 0.7));
 
-  const p = clamp01(progress);
-  const pop = easeOutBack(p, 1.35);
-  if (p <= 0.01) return;
+  // Phase 1: Mechanical Human Calculator Panel (shifts up/shrinks cleanly when Islamic Matrix activates)
+  const calcY = lerp(cy - 40, cy - 390, morphP);
+  const calcScale = lerp(1.0, 0.74, morphP);
+  const calcAlpha = lerp(1.0, 0.72, morphP) * enterP;
 
   ctx.save();
-  ctx.translate(cx, cy);
-  ctx.scale(pop, pop);
+  ctx.translate(cx, calcY);
+  ctx.scale(calcScale, calcScale);
+  ctx.globalAlpha = calcAlpha;
 
-  // Radial aura behind number
-  const aura = ctx.createRadialGradient(0, 0, 20, 0, 0, fontSize * 1.45);
-  aura.addColorStop(0, rgba(glowColor, 0.34 * p));
-  aura.addColorStop(0.55, rgba(glowColor, 0.1 * p));
-  aura.addColorStop(1, rgba(glowColor, 0));
-  ctx.fillStyle = aura;
-  ctx.beginPath();
-  ctx.arc(0, 0, fontSize * 1.45, 0, TAU);
-  ctx.fill();
+  drawBevelCard(ctx, -370, -140, 740, 280, {
+    radius: 26,
+    accent: morphP > 0.5 ? THEME.slateText : THEME.turqBright,
+    headerLabel: 'HITUNGAN MATEMATIKA MANUSIA',
+  });
 
-  ctx.font = `900 ${fontSize}px Cinzel`;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-
-  // Motion-blur style echo layers during settle
-  if (echoTrails && p < 0.98) {
-    const spread = (1 - p) * 34;
-    for (let k = 1; k <= 3; k++) {
-      ctx.globalAlpha = 0.16 * (1 - k * 0.25) * (1 - p);
-      ctx.fillStyle = glowColor;
-      ctx.fillText(valueText, 0, k * spread * 0.4);
+  // Mechanical split-flap digit slots: [1] + [1] = [2]
+  const slots = [
+    { x: -215, txt: '1', box: true },
+    { x: -108, txt: '+', box: false },
+    { x: 0, txt: '1', box: true },
+    { x: 108, txt: '=', box: false },
+    { x: 215, txt: '2', box: true, highlight: true },
+  ];
+  slots.forEach((s, idx) => {
+    const sp = springVal(localT - 0.35 - idx * 0.14);
+    ctx.save();
+    ctx.translate(s.x, 32);
+    ctx.scale(0.85 + 0.15 * sp, 0.85 + 0.15 * sp);
+    if (s.box) {
+      roundRectPath(ctx, -64, -68, 128, 136, 18);
+      ctx.fillStyle = s.highlight ? 'rgba(28, 44, 40, 0.95)' : 'rgba(14, 29, 26, 0.95)';
+      ctx.fill();
+      ctx.strokeStyle = s.highlight ? rgba(THEME.ivoryMuted, 0.6) : rgba(THEME.slateText, 0.4);
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      // Split-flap mechanical horizontal seam
+      drawStrokeLine(ctx, -62, 0, 62, 0, 'rgba(0,0,0,0.45)', 2);
     }
-  }
+    ctx.font = '800 72px JetBrains';
+    ctx.fillStyle = s.highlight ? THEME.ivory : THEME.ivoryMuted;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(s.txt, 0, 3);
+    ctx.restore();
+  });
 
-  ctx.globalAlpha = p;
-  const g = ctx.createLinearGradient(0, -fontSize * 0.5, 0, fontSize * 0.5);
-  g.addColorStop(0, '#FFFFFF');
-  g.addColorStop(0.28, colorTop);
-  g.addColorStop(0.75, colorBot);
-  g.addColorStop(1, THEME.goldDeep);
-
-  ctx.shadowColor = rgba(glowColor, 0.6);
-  ctx.shadowBlur = 32;
-  ctx.fillStyle = g;
-  ctx.fillText(valueText, 0, 0);
-  ctx.shadowBlur = 0;
-
-  ctx.strokeStyle = rgba('#FFFFFF', 0.35);
-  ctx.lineWidth = 2;
-  ctx.strokeText(valueText, 0, 0);
-
-  if (subLabel) {
-    ctx.font = '700 32px Jakarta';
-    ctx.fillStyle = THEME.ivory;
-    ctx.fillText(subLabel, 0, fontSize * 0.62);
+  // Editorial strikethrough / "TERBATAS" tag once Islamic matrix takes over
+  if (morphP > 0.6) {
+    const stP = clamp01((morphP - 0.6) / 0.4);
+    ctx.save();
+    ctx.globalAlpha = stP;
+    roundRectPath(ctx, -170, 114, 340, 42, 12);
+    ctx.fillStyle = 'rgba(92, 27, 27, 0.94)';
+    ctx.fill();
+    ctx.strokeStyle = THEME.crimsonBright;
+    ctx.lineWidth = 1.8;
+    ctx.stroke();
+    ctx.font = '700 21px JetBrains';
+    ctx.fillStyle = '#FFDADA';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('KALKULASI DUNIA TERBATAS', 0, 136);
+    ctx.restore();
   }
   ctx.restore();
+
+  // Phase 2: Islamic Multiplication Matrix (1 -> 10x -> 100x -> 700x -> INF)
+  if (morphP > 0.05) {
+    const mY = cy + 185;
+    ctx.save();
+    ctx.globalAlpha = clamp01(morphP * 1.4);
+
+    // Master Card Backdrop
+    drawBevelCard(ctx, cx - 560, mY - 300, 1120, 600, {
+      radius: 28,
+      accent: THEME.goldMedina,
+      headerLabel: 'MATEMATIKA LANGIT · PELIPATGANDAAN PAHALA',
+    });
+
+    // Source Node: 1 AMAL
+    const srcX = cx - 410;
+    const srcY = mY + 28;
+    const tierTargets = [
+      { x: cx - 105, y: mY - 125, val: '10×', label: 'MINIMAL', col: THEME.turqBright },
+      { x: cx - 105, y: mY + 180, val: '100×', label: 'BERTUMBUH', col: THEME.turqBright },
+      { x: cx + 295, y: mY - 125, val: '700×', label: 'AL-BAQARAH', col: THEME.goldBright },
+      { x: cx + 295, y: mY + 180, val: '∞', label: 'TANPA BATAS', col: THEME.goldBright },
+    ];
+
+    // Animated Bezier Conduits connecting 1 AMAL -> 10x/100x -> 700x/INF
+    const conP = easeOutCubic(clamp01((localT - 5.2) / 1.4));
+    const drawConduit = (x1, y1, x2, y2, color, p) => {
+      if (p <= 0.01) return;
+      ctx.save();
+      const midX = (x1 + x2) / 2;
+      ctx.strokeStyle = rgba(color, 0.55);
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.bezierCurveTo(midX, y1, midX, y2, x2, y2);
+      ctx.stroke();
+
+      // Traveling signal pulse along bezier
+      const u = ((totalT * 0.75) % 1);
+      const iu = 1 - u;
+      const px = iu * iu * iu * x1 + 3 * iu * iu * u * midX + 3 * iu * u * u * midX + u * u * u * x2;
+      const py = iu * iu * iu * y1 + 3 * iu * iu * u * y1 + 3 * iu * u * u * y2 + u * u * u * y2;
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.arc(px, py, 7, 0, TAU);
+      ctx.fill();
+      ctx.restore();
+    };
+
+    if (conP > 0.01) {
+      drawConduit(srcX + 95, srcY, tierTargets[0].x - 125, tierTargets[0].y, THEME.turqBright, conP);
+      drawConduit(srcX + 95, srcY, tierTargets[1].x - 125, tierTargets[1].y, THEME.turqBright, conP);
+      drawConduit(tierTargets[0].x + 125, tierTargets[0].y, tierTargets[2].x - 135, tierTargets[2].y, THEME.goldBright, clamp01((localT - 6.0) / 1.0));
+      drawConduit(tierTargets[1].x + 125, tierTargets[1].y, tierTargets[3].x - 135, tierTargets[3].y, THEME.goldBright, clamp01((localT - 6.6) / 1.0));
+    }
+
+    // Source 1 AMAL node
+    const sScale = springVal(localT - 4.8);
+    ctx.save();
+    ctx.translate(srcX, srcY);
+    ctx.scale(sScale, sScale);
+    roundRectPath(ctx, -95, -95, 190, 190, 28);
+    ctx.fillStyle = 'rgba(17, 50, 43, 0.95)';
+    ctx.fill();
+    ctx.strokeStyle = THEME.turqBright;
+    ctx.lineWidth = 3;
+    ctx.stroke();
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = '900 72px Cinzel';
+    ctx.fillStyle = THEME.ivory;
+    ctx.fillText('1', 0, -16);
+    ctx.font = '700 20px JetBrains';
+    ctx.fillStyle = THEME.turqBright;
+    ctx.fillText('KEBAIKAN', 0, 44);
+    ctx.restore();
+
+    // 4 Output Tier Cards
+    tierTargets.forEach((node, idx) => {
+      const np = springVal(localT - (5.3 + idx * 0.55));
+      if (np <= 0.02) return;
+      ctx.save();
+      ctx.translate(node.x, node.y);
+      ctx.scale(np, np);
+      roundRectPath(ctx, -135, -95, 270, 190, 24);
+      ctx.fillStyle = idx >= 2 ? 'rgba(30, 26, 13, 0.96)' : 'rgba(10, 33, 28, 0.96)';
+      ctx.fill();
+      ctx.strokeStyle = node.col;
+      ctx.lineWidth = idx >= 2 ? 3 : 2;
+      ctx.stroke();
+
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.font = '900 68px Cinzel';
+      ctx.fillStyle = node.col;
+      ctx.fillText(node.val, 0, -16);
+      ctx.font = '700 20px JetBrains';
+      ctx.fillStyle = THEME.ivoryMuted;
+      ctx.fillText(node.label, 0, 48);
+      ctx.restore();
+    });
+
+    ctx.restore();
+  }
 }
 
-export function drawGlassStatCard(ctx, x, y, w, h, title, mainText, subText, accentHex = THEME.goldMedina, progress = 1) {
-  const p = easeOutExpo(clamp01(progress));
-  if (p <= 0.01) return;
+/**
+ * x02: Illuminated Open Mushaf + 1 Unit Block Duplicating into 10 Extruded Gold Ingots (2x5 grid)
+ */
+export function drawMushafAndTenBlocks(ctx, cx, cy, localT, totalT) {
+  const bookP = easeOutExpo(clamp01(localT / 0.8));
 
+  // Top: 3D Open Mushaf Book framing the Surah badge
   ctx.save();
-  ctx.globalAlpha = p;
-  const dy = (1 - p) * 30;
-  const cy = y + dy;
+  ctx.translate(cx, cy - 285);
+  ctx.scale(0.9 + 0.1 * bookP, 0.9 + 0.1 * bookP);
+  ctx.globalAlpha = bookP;
 
-  roundRectPath(ctx, x, cy, w, h, 28);
-  const bg = ctx.createLinearGradient(x, cy, x, cy + h);
-  bg.addColorStop(0, 'rgba(11, 38, 32, 0.85)');
-  bg.addColorStop(1, 'rgba(4, 15, 13, 0.90)');
-  ctx.fillStyle = bg;
-  ctx.shadowColor = 'rgba(0,0,0,0.45)';
+  // Book outer leather cover
+  roundRectPath(ctx, -490, -155, 980, 310, 22);
+  ctx.fillStyle = '#0D2620';
+  ctx.shadowColor = 'rgba(0,0,0,0.5)';
   ctx.shadowBlur = 24;
   ctx.fill();
   ctx.shadowBlur = 0;
-
-  ctx.strokeStyle = rgba(accentHex, 0.55);
-  ctx.lineWidth = 2;
-  ctx.stroke();
-
-  // Top specular highlight bar
-  const spec = ctx.createLinearGradient(x + 30, cy, x + w - 30, cy);
-  spec.addColorStop(0, rgba('#FFFFFF', 0));
-  spec.addColorStop(0.5, rgba(accentHex, 0.75));
-  spec.addColorStop(1, rgba('#FFFFFF', 0));
-  ctx.strokeStyle = spec;
+  ctx.strokeStyle = THEME.goldMedina;
   ctx.lineWidth = 3;
-  ctx.beginPath();
-  ctx.moveTo(x + 36, cy + 2);
-  ctx.lineTo(x + w - 36, cy + 2);
   ctx.stroke();
 
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
+  // Left & Right Ivory/Emerald Parchment Pages
+  for (const side of [-1, 1]) {
+    const px = side < 0 ? -466 : 8;
+    roundRectPath(ctx, px, -135, 458, 270, 14);
+    const pGrad = ctx.createLinearGradient(side < 0 ? px + 458 : px, 0, side < 0 ? px : px + 458, 0);
+    pGrad.addColorStop(0, '#071713');
+    pGrad.addColorStop(0.14, '#0E2B24');
+    pGrad.addColorStop(1, '#12332B');
+    ctx.fillStyle = pGrad;
+    ctx.fill();
+    ctx.strokeStyle = rgba(THEME.goldMedina, 0.4);
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
 
-  if (title) {
-    ctx.font = '700 24px JetBrains';
-    ctx.fillStyle = accentHex;
-    ctx.fillText(title, x + w / 2, subText ? cy + 36 : cy + h * 0.29);
-  }
-  if (mainText) {
-    let mSize = subText ? 52 : 48;
-    ctx.font = `800 ${mSize}px Jakarta`;
-    while (ctx.measureText(mainText).width > w - 48 && mSize > 26) {
-      mSize -= 2;
-      ctx.font = `800 ${mSize}px Jakarta`;
+    // Decorative inner border on each Mushaf page
+    roundRectPath(ctx, px + 18, -118, 422, 236, 10);
+    ctx.strokeStyle = rgba(THEME.goldMedina, 0.25);
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+
+    // Fine Quranic guide lines + crisp page label
+    for (let ln = 0; ln < 4; ln++) {
+      const ly = -76 + ln * 46;
+      drawStrokeLine(ctx, px + 44, ly, px + 414, ly, rgba(THEME.goldMedina, 0.14), 1.8);
     }
-    ctx.fillStyle = THEME.ivory;
-    ctx.fillText(mainText, x + w / 2, subText ? cy + h * 0.54 : cy + h * 0.68);
-  }
-  if (subText) {
-    let sSize = 27;
-    ctx.font = `500 ${sSize}px Jakarta`;
-    while (ctx.measureText(subText).width > w - 48 && sSize > 18) {
-      sSize -= 1;
-      ctx.font = `500 ${sSize}px Jakarta`;
-    }
+
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = '700 20px JetBrains';
+    ctx.fillStyle = THEME.turqBright;
+    ctx.fillText(side < 0 ? 'WAHYU AL-QUR\'AN' : 'KAIDAH RAHMAT', px + 229, -46);
+    ctx.font = '800 32px Cinzel';
+    ctx.fillStyle = THEME.goldBright;
+    ctx.fillText(side < 0 ? 'QS. AL-AN\'AM' : 'AYAT 160 · 10×', px + 229, 10);
+    ctx.font = '500 20px Jakarta';
     ctx.fillStyle = THEME.ivoryMuted;
-    ctx.fillText(subText, x + w / 2, cy + h - 34);
+    ctx.fillText(side < 0 ? 'Juz 8 · Ayat ke-160' : 'Batas Bawah Pahala', px + 229, 54);
   }
+
+  // Spine & Bookmark Ribbon
+  const spine = ctx.createLinearGradient(-16, 0, 16, 0);
+  spine.addColorStop(0, 'rgba(0,0,0,0.6)');
+  spine.addColorStop(0.5, rgba(THEME.goldBright, 0.35));
+  spine.addColorStop(1, 'rgba(0,0,0,0.6)');
+  ctx.fillStyle = spine;
+  ctx.fillRect(-16, -135, 32, 270);
+  drawRubElHizbBadge(ctx, 0, 0, 16, totalT * 0.2, THEME.goldBright, 2, '#0A1E1A');
+
+  // Ribbon bookmark hanging from center
+  ctx.fillStyle = THEME.turqMid;
+  ctx.beginPath();
+  ctx.moveTo(-10, 135);
+  ctx.lineTo(10, 135);
+  ctx.lineTo(10, 185);
+  ctx.lineTo(0, 172);
+  ctx.lineTo(-10, 185);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.restore();
+
+  // Bottom Stage: 1 Gold Block -> 10 Gold Blocks (2x5 Matrix)
+  const matY = cy + 205;
+  drawBevelCard(ctx, cx - 560, matY - 210, 1120, 420, {
+    radius: 26,
+    accent: THEME.turqBright,
+    headerLabel: 'MULTIPLIKASI MINIMAL · 1 KEBAIKAN MENJADI 10 PAHALA',
+  });
+
+  // Left: 1 Source Unit Block
+  const srcP = springVal(localT - 0.8);
+  const drawIngot = (x, y, w, h, colorTop, colorFront, label, scale = 1) => {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(scale, scale);
+    const depth = 12;
+    // Top face
+    ctx.fillStyle = colorTop;
+    ctx.beginPath();
+    ctx.moveTo(-w / 2, -h / 2);
+    ctx.lineTo(-w / 2 + depth, -h / 2 - depth);
+    ctx.lineTo(w / 2 + depth, -h / 2 - depth);
+    ctx.lineTo(w / 2, -h / 2);
+    ctx.closePath();
+    ctx.fill();
+    // Right face
+    ctx.fillStyle = rgba(colorFront, 0.55);
+    ctx.beginPath();
+    ctx.moveTo(w / 2, -h / 2);
+    ctx.lineTo(w / 2 + depth, -h / 2 - depth);
+    ctx.lineTo(w / 2 + depth, h / 2 - depth);
+    ctx.lineTo(w / 2, h / 2);
+    ctx.closePath();
+    ctx.fill();
+    // Front face
+    roundRectPath(ctx, -w / 2, -h / 2, w, h, 10);
+    ctx.fillStyle = colorFront;
+    ctx.fill();
+    ctx.strokeStyle = rgba('#FFFFFF', 0.35);
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    ctx.font = '800 28px JetBrains';
+    ctx.fillStyle = THEME.bgObsidian;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(label, 0, 2);
+    ctx.restore();
+  };
+
+  if (srcP > 0.02) {
+    drawIngot(cx - 400, matY + 25, 130, 130, '#6FF7DF', THEME.turqBright, '1×', srcP);
+  }
+
+  // Animated Arrow Connector
+  const arrP = easeOutCubic(clamp01((localT - 1.5) / 0.5));
+  if (arrP > 0.02) {
+    const ax1 = cx - 295;
+    const ax2 = lerp(ax1, cx - 185, arrP);
+    drawStrokeLine(ctx, ax1, matY + 25, ax2, matY + 25, THEME.goldBright, 5, arrP);
+    if (arrP > 0.7) {
+      ctx.fillStyle = THEME.goldBright;
+      ctx.beginPath();
+      ctx.moveTo(ax2 + 16, matY + 25);
+      ctx.lineTo(ax2 - 6, matY + 12);
+      ctx.lineTo(ax2 - 6, matY + 38);
+      ctx.closePath();
+      ctx.fill();
+    }
+  }
+
+  // Right: 2 rows x 5 cols = 10 Gold Ingots appearing sequentially
+  for (let i = 0; i < 10; i++) {
+    const col = i % 5;
+    const row = Math.floor(i / 5);
+    const gx = cx - 80 + col * 130;
+    const gy = matY - 42 + row * 124;
+    const gp = springVal(localT - (1.8 + i * 0.14), 220, 16);
+    if (gp > 0.02) {
+      drawIngot(gx, gy, 96, 92, '#FFF1BA', THEME.goldBright, String(i + 1), gp);
+    }
+  }
+}
+
+/**
+ * x03: Precision Balance Instrument (Mizan) + Justice vs Mercy Split Ledger
+ */
+export function drawPrecisionMizan(ctx, cx, cy, localT, totalT) {
+  const enter = easeOutExpo(clamp01(localT / 0.75));
+  const tiltTarget = lerp(0, 0.25, easeOutElastic(clamp01((localT - 0.9) / 1.7))) + Math.sin(totalT * 1.4) * 0.015;
+
+  ctx.save();
+  ctx.globalAlpha = enter;
+
+  // Architectural base pedestal
+  const baseY = cy + 90;
+  roundRectPath(ctx, cx - 190, baseY - 20, 380, 34, 10);
+  ctx.fillStyle = THEME.goldAmber;
+  ctx.fill();
+  roundRectPath(ctx, cx - 125, baseY - 46, 250, 28, 8);
+  ctx.fillStyle = THEME.goldMedina;
+  ctx.fill();
+
+  // Calibrated Fulcrum Protractor Gauge behind pivot
+  const pivY = cy - 230;
+  ctx.strokeStyle = rgba(THEME.goldMedina, 0.35);
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(cx, pivY, 130, Math.PI * 0.15, Math.PI * 0.85);
+  ctx.stroke();
+  for (let a = 0; a <= 8; a++) {
+    const ang = Math.PI * (0.15 + (a / 8) * 0.7);
+    const r1 = 122;
+    const r2 = a === 4 ? 144 : 134;
+    drawStrokeLine(
+      ctx,
+      cx + Math.cos(ang) * r1,
+      pivY + Math.sin(ang) * r1,
+      cx + Math.cos(ang) * r2,
+      pivY + Math.sin(ang) * r2,
+      a === 4 ? THEME.ivoryMuted : rgba(THEME.goldMedina, 0.5),
+      a === 4 ? 3 : 1.5,
+    );
+  }
+
+  // Central Vertical Brass Column
+  const colGrad = ctx.createLinearGradient(cx - 12, pivY, cx + 12, baseY - 46);
+  colGrad.addColorStop(0, THEME.goldBright);
+  colGrad.addColorStop(0.5, THEME.goldMedina);
+  colGrad.addColorStop(1, THEME.goldDeep);
+  roundRectPath(ctx, cx - 12, pivY, 24, baseY - 46 - pivY, 6);
+  ctx.fillStyle = colGrad;
+  ctx.fill();
+
+  // Tilting Beam
+  const beamW = 760;
+  const lx = cx - (beamW / 2) * Math.cos(tiltTarget);
+  const ly = pivY - (beamW / 2) * Math.sin(tiltTarget);
+  const rx = cx + (beamW / 2) * Math.cos(tiltTarget);
+  const ry = pivY + (beamW / 2) * Math.sin(tiltTarget);
+
+  ctx.save();
+  ctx.translate(cx, pivY);
+  ctx.rotate(tiltTarget);
+  roundRectPath(ctx, -beamW / 2 - 14, -9, beamW + 28, 18, 9);
+  ctx.fillStyle = THEME.goldBright;
+  ctx.fill();
+  ctx.restore();
+
+  // Pivot Pointer Needle
+  ctx.save();
+  ctx.translate(cx, pivY);
+  ctx.rotate(tiltTarget);
+  ctx.fillStyle = THEME.ivory;
+  ctx.beginPath();
+  ctx.moveTo(-6, 12);
+  ctx.lineTo(6, 12);
+  ctx.lineTo(0, 118);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+
+  // Pivot Medallion
+  ctx.fillStyle = THEME.bgObsidian;
+  ctx.beginPath();
+  ctx.arc(cx, pivY, 22, 0, TAU);
+  ctx.fill();
+  ctx.strokeStyle = THEME.goldBright;
+  ctx.lineWidth = 4;
+  ctx.stroke();
+
+  // Left Pan: 1 Crimson Block (KEBURUKAN = 1x)
+  const panHang = 185;
+  const drawPan = (px, py, isRight) => {
+    const panW = 240;
+    drawStrokeLine(ctx, px, py, px - panW * 0.44, py + panHang, rgba(THEME.goldMedina, 0.75), 2.5);
+    drawStrokeLine(ctx, px, py, px + panW * 0.44, py + panHang, rgba(THEME.goldMedina, 0.75), 2.5);
+
+    const dishY = py + panHang;
+    ctx.fillStyle = THEME.goldMedina;
+    ctx.beginPath();
+    ctx.moveTo(px - panW / 2, dishY);
+    ctx.lineTo(px + panW / 2, dishY);
+    ctx.quadraticCurveTo(px, dishY + 34, px - panW / 2, dishY);
+    ctx.fill();
+
+    if (!isRight) {
+      // Single crimson unit cube
+      roundRectPath(ctx, px - 28, dishY - 56, 56, 56, 10);
+      ctx.fillStyle = THEME.crimsonBright;
+      ctx.fill();
+      ctx.strokeStyle = '#FFB3B3';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.font = '800 26px JetBrains';
+      ctx.fillStyle = '#FFFFFF';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('1×', px, dishY - 28);
+    } else {
+      // 10 stacked gold bars (2 cols x 5 rows)
+      for (let i = 0; i < 10; i++) {
+        const col = i % 2;
+        const row = Math.floor(i / 2);
+        const bx = px - 58 + col * 64;
+        const by = dishY - 24 - row * 24;
+        roundRectPath(ctx, bx, by, 54, 19, 5);
+        ctx.fillStyle = row % 2 === 0 ? THEME.goldBright : THEME.goldMedina;
+        ctx.fill();
+      }
+    }
+
+    // Precision callout badge below pan
+    roundRectPath(ctx, px - 135, dishY + 38, 270, 74, 14);
+    ctx.fillStyle = isRight ? 'rgba(13, 38, 31, 0.94)' : 'rgba(38, 16, 16, 0.94)';
+    ctx.fill();
+    ctx.strokeStyle = isRight ? THEME.goldBright : THEME.crimsonBright;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = '800 28px Cinzel';
+    ctx.fillStyle = isRight ? THEME.goldBright : THEME.crimsonBright;
+    ctx.fillText(isRight ? '10× — 700×' : '1× SAJA', px, dishY + 62);
+    ctx.font = '700 18px JetBrains';
+    ctx.fillStyle = THEME.ivoryMuted;
+    ctx.fillText(isRight ? 'KEBAIKAN (RAHMAT)' : 'KEBURUKAN (ADIL)', px, dishY + 92);
+  };
+
+  drawPan(lx, ly, false);
+  drawPan(rx, ry, true);
+
+  // Bottom Dual Editorial Comparison Cards (Al-Qurthubi)
+  const cardP = easeOutExpo(clamp01((localT - 1.8) / 0.7));
+  if (cardP > 0.02) {
+    ctx.save();
+    ctx.globalAlpha = cardP;
+    const cardY = cy + 235;
+    drawBevelCard(ctx, cx - 560, cardY, 540, 175, {
+      radius: 20,
+      accent: THEME.crimsonBright,
+      headerLabel: 'KEADILAN ALLAH',
+    });
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = '800 40px Jakarta';
+    ctx.fillStyle = THEME.ivory;
+    ctx.fillText('1 DOSA = 1 BALASAN', cx - 290, cardY + 100);
+    ctx.font = '500 23px Jakarta';
+    ctx.fillStyle = THEME.ivoryMuted;
+    ctx.fillText('Tidak pernah dilebihkan seberat pun', cx - 290, cardY + 142);
+
+    drawBevelCard(ctx, cx + 20, cardY, 540, 175, {
+      radius: 20,
+      accent: THEME.goldBright,
+      headerLabel: 'RAHMAT ALLAH',
+    });
+    ctx.font = '800 40px Jakarta';
+    ctx.fillStyle = THEME.goldBright;
+    ctx.fillText('1 AMAL = 10× — 700×', cx + 290, cardY + 100);
+    ctx.font = '500 23px Jakarta';
+    ctx.fillStyle = THEME.ivoryMuted;
+    ctx.fillText('Dilipatgandakan tanpa batas hitungan', cx + 290, cardY + 142);
+    ctx.restore();
+  }
+
   ctx.restore();
 }
 
-export function drawMizanScale(ctx, cx, cy, scaleW, tiltRad, leftInfo, rightInfo, progress, t) {
-  const p = easeOutExpo(clamp01(progress));
-  if (p <= 0.01) return;
+/**
+ * x04: Heart-to-Angelic-Scroll Intention System (+1 Hasanah Kamilah Stamp)
+ */
+export function drawHeartToScrollSystem(ctx, cx, cy, localT, totalT) {
+  const enter = easeOutExpo(clamp01(localT / 0.7));
+  ctx.save();
+  ctx.globalAlpha = enter;
+
+  // Left: Anatomical/Geometric Heart Chamber emitting Intention Beam
+  const hx = cx - 330;
+  const hy = cy - 90;
+  const pulse = 1 + 0.04 * Math.sin(totalT * 4.2);
+
+  drawBevelCard(ctx, hx - 210, hy - 220, 420, 440, {
+    radius: 26,
+    accent: THEME.turqBright,
+    headerLabel: 'NIAT DI DALAM HATI',
+  });
 
   ctx.save();
-  ctx.globalAlpha = p;
-  ctx.translate(cx, cy);
-
-  const pillarH = 420;
-  const topPivotY = -pillarH * 0.55;
-
-  // Base pedestal
-  const baseGrad = ctx.createLinearGradient(-140, pillarH * 0.45, 140, pillarH * 0.45);
-  baseGrad.addColorStop(0, THEME.goldDeep);
-  baseGrad.addColorStop(0.5, THEME.goldBright);
-  baseGrad.addColorStop(1, THEME.goldDeep);
-  ctx.fillStyle = baseGrad;
-  roundRectPath(ctx, -135, pillarH * 0.42, 270, 26, 13);
-  ctx.fill();
-  roundRectPath(ctx, -85, pillarH * 0.36, 170, 22, 11);
-  ctx.fill();
-
-  // Ornate central vertical pillar
-  const pGrad = ctx.createLinearGradient(-12, topPivotY, 12, pillarH * 0.4);
-  pGrad.addColorStop(0, THEME.goldBright);
-  pGrad.addColorStop(0.5, THEME.goldMedina);
-  pGrad.addColorStop(1, THEME.goldDeep);
-  ctx.fillStyle = pGrad;
-  roundRectPath(ctx, -10, topPivotY, 20, pillarH * 0.92, 10);
-  ctx.fill();
-
-  // Finial Rub el Hizb atop pillar
-  drawRubElHizb(ctx, 0, topPivotY - 34, 24, t * 0.5, THEME.goldBright, 2.2, rgba(THEME.goldMedina, 0.25));
-
-  // Tilting beam
-  ctx.save();
-  ctx.translate(0, topPivotY);
-  ctx.rotate(tiltRad);
-
-  const halfArm = scaleW * 0.5;
-  ctx.strokeStyle = THEME.goldBright;
-  ctx.lineWidth = 10;
-  ctx.lineCap = 'round';
-  ctx.shadowColor = rgba(THEME.goldMedina, 0.5);
-  ctx.shadowBlur = 14;
+  ctx.translate(hx, hy + 10);
+  ctx.scale(pulse, pulse);
+  // Crisp geometric heart emblem
   ctx.beginPath();
-  ctx.moveTo(-halfArm, 0);
-  ctx.quadraticCurveTo(-halfArm * 0.5, -24, 0, 0);
-  ctx.quadraticCurveTo(halfArm * 0.5, -24, halfArm, 0);
+  ctx.moveTo(0, 76);
+  ctx.bezierCurveTo(-110, 10, -110, -80, -45, -80);
+  ctx.bezierCurveTo(-10, -80, 0, -45, 0, -35);
+  ctx.bezierCurveTo(0, -45, 10, -80, 45, -80);
+  ctx.bezierCurveTo(110, -80, 110, 10, 0, 76);
+  ctx.closePath();
+  const hGrad = ctx.createLinearGradient(0, -80, 0, 80);
+  hGrad.addColorStop(0, THEME.turqBright);
+  hGrad.addColorStop(1, THEME.turqDeep);
+  ctx.fillStyle = hGrad;
+  ctx.fill();
+  ctx.strokeStyle = '#B0FFF1';
+  ctx.lineWidth = 3;
   ctx.stroke();
-  ctx.shadowBlur = 0;
 
-  // Left & Right hanging pans (keep pans upright)
-  const drawPan = (px, info, isRight) => {
+  ctx.font = '800 26px JetBrains';
+  ctx.fillStyle = THEME.bgObsidian;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('TEKAD BAIK', 0, -6);
+  ctx.restore();
+
+  ctx.font = '500 24px Jakarta';
+  ctx.fillStyle = THEME.ivoryMuted;
+  ctx.textAlign = 'center';
+  ctx.fillText('Walau belum terlaksana', hx, hy + 165);
+
+  // Connecting Intent Conduit Line -> Angelic Ledger
+  const beamP = easeOutCubic(clamp01((localT - 0.9) / 0.8));
+  if (beamP > 0.01) {
+    const bx1 = hx + 210;
+    const bx2 = lerp(bx1, cx - 25, beamP);
+    drawStrokeLine(ctx, bx1, hy + 10, bx2, hy + 10, THEME.goldBright, 5, 0.9);
+    if (beamP > 0.7) {
+      ctx.fillStyle = THEME.goldBright;
+      ctx.beginPath();
+      ctx.moveTo(bx2 + 16, hy + 10);
+      ctx.lineTo(bx2 - 6, hy - 4);
+      ctx.lineTo(bx2 - 6, hy + 24);
+      ctx.closePath();
+      ctx.fill();
+    }
+  }
+
+  // Right: Angelic Ledger Card + Gold Seal Stamp (+1 PENUH)
+  const lx = cx + 260;
+  drawBevelCard(ctx, lx - 280, hy - 220, 560, 440, {
+    radius: 26,
+    accent: THEME.goldBright,
+    headerLabel: 'CATATAN MALAIKAT',
+  });
+
+  // Two ledger line entries
+  const rows = [
+    { y: hy - 95, tag: 'STATUS NIAT', val: 'TERCATAT OTOMATIS', p: stagger(localT - 1.1, 0, 0.35) },
+    { y: hy + 5, tag: 'NILAI PAHALA', val: '1 KEBAIKAN SEMPURNA', p: stagger(localT - 1.1, 1, 0.35) },
+  ];
+  rows.forEach((r) => {
+    if (r.p <= 0.02) return;
     ctx.save();
-    ctx.translate(px, 0);
-    ctx.rotate(-tiltRad);
-
-    const dropLen = 220;
-    const panW = 240;
-
-    // Suspension chains
-    ctx.strokeStyle = rgba(THEME.goldBright, 0.72);
-    ctx.lineWidth = 2.4;
-    ctx.beginPath();
-    ctx.moveTo(0, 0);
-    ctx.lineTo(-panW * 0.42, dropLen);
-    ctx.moveTo(0, 0);
-    ctx.lineTo(panW * 0.42, dropLen);
-    ctx.moveTo(0, 0);
-    ctx.lineTo(0, dropLen);
+    ctx.globalAlpha = easeOutCubic(r.p);
+    roundRectPath(ctx, lx - 240, r.y - 36, 480, 74, 14);
+    ctx.fillStyle = 'rgba(13, 36, 30, 0.9)';
+    ctx.fill();
+    ctx.strokeStyle = rgba(THEME.goldMedina, 0.45);
+    ctx.lineWidth = 1.5;
     ctx.stroke();
 
-    // Glowing pan bowl
-    const bowlGrad = ctx.createLinearGradient(-panW / 2, dropLen, panW / 2, dropLen + 36);
-    bowlGrad.addColorStop(0, THEME.goldDeep);
-    bowlGrad.addColorStop(0.5, THEME.goldBright);
-    bowlGrad.addColorStop(1, THEME.goldDeep);
-    ctx.fillStyle = bowlGrad;
+    ctx.textAlign = 'left';
+    ctx.font = '700 18px JetBrains';
+    ctx.fillStyle = THEME.turqBright;
+    ctx.fillText(r.tag, lx - 218, r.y - 11);
+
+    ctx.font = '800 26px Jakarta';
+    ctx.fillStyle = THEME.ivory;
+    ctx.fillText(r.val, lx - 218, r.y + 18);
+    ctx.restore();
+  });
+
+  // Embossed Stamp: +1 HASANAH KAMILAH
+  const stampP = springVal(localT - 2.3, 260, 16);
+  if (stampP > 0.02) {
+    ctx.save();
+    ctx.translate(lx, hy + 135);
+    ctx.scale(lerp(1.5, 1.0, stampP), lerp(1.5, 1.0, stampP));
+    ctx.globalAlpha = clamp01(stampP);
+    roundRectPath(ctx, -210, -44, 420, 88, 16);
+    ctx.fillStyle = THEME.goldBright;
+    ctx.fill();
+    ctx.font = '900 34px Cinzel';
+    ctx.fillStyle = THEME.bgObsidian;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('+1  PAHALA PENUH', 0, 2);
+    ctx.restore();
+  }
+
+  ctx.restore();
+}
+
+/**
+ * x05: Intercept & Transform Gate (Bad Impulse Deflected by Taqwa Shield into +1 Good Deed)
+ */
+export function drawInterceptGateDiagram(ctx, cx, cy, localT) {
+  const enter = easeOutExpo(clamp01(localT / 0.65));
+  ctx.save();
+  ctx.globalAlpha = enter;
+
+  drawBevelCard(ctx, cx - 560, cy - 330, 1120, 620, {
+    radius: 28,
+    accent: THEME.turqBright,
+    headerLabel: 'MEKANISME PENOLAKAN NIAT BURUK KARENA ALLAH',
+  });
+
+  const leftX = cx - 400;
+  const shieldX = cx;
+  const rightTopY = cy - 110;
+  const rightBotY = cy + 165;
+  const rightX = cx + 380;
+
+  // Target A (Bottom): CATATAN DOSA (blocked / dimmed)
+  roundRectPath(ctx, rightX - 150, rightBotY - 68, 300, 136, 18);
+  ctx.fillStyle = 'rgba(42, 16, 16, 0.72)';
+  ctx.fill();
+  ctx.strokeStyle = rgba(THEME.crimsonBright, 0.35);
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.font = '700 20px JetBrains';
+  ctx.fillStyle = THEME.crimsonBright;
+  ctx.fillText('CATATAN DOSA', rightX, rightBotY - 22);
+  ctx.font = '800 38px Cinzel';
+  ctx.fillStyle = rgba(THEME.ivoryMuted, 0.45);
+  ctx.fillText('0 (BATAL)', rightX, rightBotY + 22);
+
+  // Blocked dashed track from shield to Dosa
+  ctx.save();
+  ctx.setLineDash([10, 10]);
+  drawStrokeLine(ctx, shieldX + 40, cy + 40, rightX - 160, rightBotY, rgba(THEME.crimsonBright, 0.3), 3);
+  ctx.restore();
+
+  // Target B (Top): CATATAN PAHALA (+1)
+  const hitP = easeOutCubic(clamp01((localT - 1.9) / 0.7));
+  roundRectPath(ctx, rightX - 150, rightTopY - 72, 300, 144, 18);
+  ctx.fillStyle = hitP > 0.5 ? 'rgba(26, 44, 24, 0.96)' : 'rgba(13, 33, 28, 0.9)';
+  ctx.fill();
+  ctx.strokeStyle = hitP > 0.5 ? THEME.goldBright : rgba(THEME.goldMedina, 0.45);
+  ctx.lineWidth = hitP > 0.5 ? 3.5 : 2;
+  ctx.stroke();
+  ctx.font = '700 20px JetBrains';
+  ctx.fillStyle = THEME.turqBright;
+  ctx.fillText('CATATAN PAHALA', rightX, rightTopY - 26);
+  ctx.font = '900 46px Cinzel';
+  ctx.fillStyle = hitP > 0.5 ? THEME.goldBright : THEME.ivoryMuted;
+  ctx.fillText('+1 PENUH', rightX, rightTopY + 22);
+
+  // Source: NIAT BURUK MUNCUL
+  roundRectPath(ctx, leftX - 135, cy - 30, 270, 130, 18);
+  ctx.fillStyle = 'rgba(42, 16, 16, 0.92)';
+  ctx.fill();
+  ctx.strokeStyle = THEME.crimsonBright;
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+  ctx.font = '700 20px JetBrains';
+  ctx.fillStyle = '#FFB3B3';
+  ctx.fillText('DORONGAN HATI', leftX, cy + 12);
+  ctx.font = '800 30px Jakarta';
+  ctx.fillStyle = THEME.ivory;
+  ctx.fillText('NIAT BURUK', leftX, cy + 54);
+
+  // Incoming crimson path -> Shield -> Deflected golden curve -> Pahala
+  const inP = clamp01((localT - 0.5) / 0.9);
+  drawStrokeLine(ctx, leftX + 135, cy + 35, lerp(leftX + 135, shieldX - 30, inP), cy + 35, THEME.crimsonBright, 5);
+
+  const defP = easeOutCubic(clamp01((localT - 1.4) / 0.9));
+  if (defP > 0.01) {
+    ctx.save();
+    ctx.strokeStyle = THEME.goldBright;
+    ctx.lineWidth = 6;
+    ctx.lineCap = 'round';
     ctx.beginPath();
-    ctx.moveTo(-panW * 0.5, dropLen);
-    ctx.lineTo(panW * 0.5, dropLen);
-    ctx.quadraticCurveTo(0, dropLen + 52, -panW * 0.5, dropLen);
+    ctx.moveTo(shieldX, cy + 35);
+    const ex = lerp(shieldX, rightX - 155, defP);
+    const ey = lerp(cy + 35, rightTopY, defP);
+    ctx.quadraticCurveTo(shieldX + 90, rightTopY, ex, ey);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // Center Taqwa Shield Barrier
+  const shP = springVal(localT - 1.0, 240, 16);
+  ctx.save();
+  ctx.translate(shieldX, cy + 35);
+  ctx.scale(shP, shP);
+  ctx.beginPath();
+  ctx.moveTo(0, -108);
+  ctx.lineTo(86, -68);
+  ctx.lineTo(74, 38);
+  ctx.quadraticCurveTo(0, 112, 0, 112);
+  ctx.quadraticCurveTo(0, 112, -74, 38);
+  ctx.lineTo(-86, -68);
+  ctx.closePath();
+  const shG = ctx.createLinearGradient(0, -108, 0, 112);
+  shG.addColorStop(0, THEME.turqBright);
+  shG.addColorStop(1, THEME.turqDeep);
+  ctx.fillStyle = shG;
+  ctx.fill();
+  ctx.strokeStyle = THEME.goldBright;
+  ctx.lineWidth = 4;
+  ctx.stroke();
+  ctx.font = '800 22px JetBrains';
+  ctx.fillStyle = THEME.bgObsidian;
+  ctx.fillText('TAKUT', 0, -18);
+  ctx.fillText('ALLAH', 0, 14);
+  ctx.restore();
+
+  ctx.restore();
+}
+
+/**
+ * x06: Studio-Grade Exponential Area Chart & Callout Flags (1 -> 10x -> 100x -> 700x -> INF)
+ */
+export function drawExponentialAreaChart(ctx, cx, cy, localT) {
+  const enter = easeOutExpo(clamp01(localT / 0.65));
+  ctx.save();
+  ctx.globalAlpha = enter;
+
+  const boxW = 1140;
+  const boxH = 740;
+  const bx = cx - boxW / 2;
+  const by = cy - boxH / 2 - 40;
+
+  drawBevelCard(ctx, bx, by, boxW, boxH, {
+    radius: 28,
+    accent: THEME.goldMedina,
+    headerLabel: 'KURVA ESKALASI PAHALA SAAT NIAT DIAMALKAN',
+  });
+
+  // Chart plotting region
+  const px = bx + 135;
+  const py = by + 110;
+  const pw = boxW - 210;
+  const ph = boxH - 220;
+
+  // Horizontal Y-axis reference gridlines (exponential spacing)
+  const yLevels = [
+    { ratio: 0.08, label: '1×' },
+    { ratio: 0.18, label: '10×' },
+    { ratio: 0.36, label: '100×' },
+    { ratio: 0.66, label: '700×' },
+    { ratio: 0.95, label: '∞' },
+  ];
+  yLevels.forEach((lv) => {
+    const ly = py + ph * (1 - lv.ratio);
+    drawStrokeLine(ctx, px, ly, px + pw, ly, rgba(THEME.turqBright, 0.14), 1.5);
+    ctx.font = '700 24px JetBrains';
+    ctx.fillStyle = lv.label === '700×' || lv.label === '∞' ? THEME.goldBright : THEME.slateText;
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(lv.label, px - 18, ly);
+  });
+
+  // Axes
+  drawStrokeLine(ctx, px, py, px, py + ph, rgba(THEME.ivoryMuted, 0.4), 2);
+  drawStrokeLine(ctx, px, py + ph, px + pw, py + ph, rgba(THEME.ivoryMuted, 0.4), 2);
+
+  // 5 Key data points along exponential curve
+  const pts = [
+    { x: px + pw * 0.08, y: py + ph * (1 - 0.08), val: '1×', tag: 'NIAT', col: THEME.turqBright },
+    { x: px + pw * 0.30, y: py + ph * (1 - 0.18), val: '10×', tag: 'MINIMAL', col: THEME.turqBright },
+    { x: px + pw * 0.53, y: py + ph * (1 - 0.36), val: '100×', tag: 'BERTUMBUH', col: THEME.goldMedina },
+    { x: px + pw * 0.76, y: py + ph * (1 - 0.66), val: '700×', tag: 'AL-BAQARAH', col: THEME.goldBright },
+    { x: px + pw * 0.95, y: py + ph * (1 - 0.95), val: '∞', tag: 'TAK TERHINGGA', col: '#FFFFFF' },
+  ];
+
+  const drawP = easeOutCubic(clamp01((localT - 0.4) / 2.6));
+  const totalSegs = pts.length - 1;
+  const curFloat = drawP * totalSegs;
+
+  // Build interpolated spline path up to drawP
+  const activePts = [pts[0]];
+  for (let i = 0; i < totalSegs; i++) {
+    if (curFloat >= i + 1) {
+      activePts.push(pts[i + 1]);
+    } else if (curFloat > i) {
+      const f = curFloat - i;
+      activePts.push({
+        x: lerp(pts[i].x, pts[i + 1].x, f),
+        y: lerp(pts[i].y, pts[i + 1].y, f * f * (3 - 2 * f)),
+      });
+    }
+  }
+
+  if (activePts.length >= 2) {
+    // Translucent Area Fill
+    const areaGrad = ctx.createLinearGradient(0, py, 0, py + ph);
+    areaGrad.addColorStop(0, rgba(THEME.goldBright, 0.32));
+    areaGrad.addColorStop(0.55, rgba(THEME.turqBright, 0.14));
+    areaGrad.addColorStop(1, rgba(THEME.turqBright, 0.0));
+    ctx.fillStyle = areaGrad;
+    ctx.beginPath();
+    ctx.moveTo(activePts[0].x, py + ph);
+    activePts.forEach((pt) => ctx.lineTo(pt.x, pt.y));
+    ctx.lineTo(activePts[activePts.length - 1].x, py + ph);
     ctx.closePath();
     ctx.fill();
 
-    // Orbs / cargo sitting on pan
-    const orbCount = info.orbs || 1;
-    for (let o = 0; o < orbCount; o++) {
-      const row = Math.floor(o / 4);
-      const col = o % 4;
-      const ox = (col - Math.min(3, orbCount - 1 - row * 4) / 2) * 42;
-      const oy = dropLen - 22 - row * 36 + Math.sin(t * 2.5 + o) * 3;
-      const og = ctx.createRadialGradient(ox - 5, oy - 5, 2, ox, oy, 20);
-      og.addColorStop(0, '#FFFFFF');
-      og.addColorStop(0.4, info.orbColor || THEME.goldBright);
-      og.addColorStop(1, rgba(info.orbColor || THEME.goldMedina, 0.2));
-      ctx.fillStyle = og;
+    // Glowing Curve Stroke
+    const lineGrad = ctx.createLinearGradient(px, 0, px + pw, 0);
+    lineGrad.addColorStop(0, THEME.turqBright);
+    lineGrad.addColorStop(0.65, THEME.goldBright);
+    lineGrad.addColorStop(1, '#FFFFFF');
+    ctx.strokeStyle = lineGrad;
+    ctx.lineWidth = 6;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.beginPath();
+    activePts.forEach((pt, idx) => (idx === 0 ? ctx.moveTo(pt.x, pt.y) : ctx.lineTo(pt.x, pt.y)));
+    ctx.stroke();
+  }
+
+  // Milestone Nodes + Flags
+  pts.forEach((pt, idx) => {
+    const mp = springVal(localT - (0.4 + idx * 0.55));
+    if (mp <= 0.02) return;
+    ctx.save();
+    ctx.globalAlpha = clamp01(mp);
+
+    // Vertical drop guide
+    drawStrokeLine(ctx, pt.x, pt.y, pt.x, py + ph, rgba(pt.col, 0.25), 1.5);
+
+    // Node Ring
+    ctx.fillStyle = THEME.bgObsidian;
+    ctx.beginPath();
+    ctx.arc(pt.x, pt.y, 12, 0, TAU);
+    ctx.fill();
+    ctx.strokeStyle = pt.col;
+    ctx.lineWidth = 4;
+    ctx.stroke();
+
+    // Floating value pill above node
+    const pillY = pt.y - 46;
+    roundRectPath(ctx, pt.x - 56, pillY - 22, 112, 44, 12);
+    ctx.fillStyle = idx >= 3 ? THEME.goldBright : 'rgba(10, 32, 27, 0.96)';
+    ctx.fill();
+    ctx.strokeStyle = pt.col;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.font = '900 24px Cinzel';
+    ctx.fillStyle = idx >= 3 ? THEME.bgObsidian : pt.col;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(pt.val, pt.x, pillY + 1);
+
+    // X-axis label
+    ctx.font = '700 19px JetBrains';
+    ctx.fillStyle = THEME.ivoryMuted;
+    ctx.fillText(pt.tag, pt.x, py + ph + 32);
+    ctx.restore();
+  });
+
+  ctx.restore();
+}
+
+/**
+ * x07: Botanical Cross-Section Growth Diagram (Soil Strata + Roots + 7 Articulated Wheat Stalks)
+ */
+export function drawBotanicalCrossSection(ctx, cx, cy, localT, totalT) {
+  const enter = easeOutExpo(clamp01(localT / 0.6));
+  ctx.save();
+  ctx.globalAlpha = enter;
+
+  drawBevelCard(ctx, cx - 560, cy - 410, 1120, 820, {
+    radius: 28,
+    accent: THEME.goldMedina,
+    headerLabel: 'ANATOMI PERUMPAMAAN AL-BAQARAH AYAT 261',
+  });
+
+  const groundY = cy + 190;
+  const seedY = groundY + 46;
+
+  // Soil Cross-Section Strata inside bottom of card
+  ctx.save();
+  roundRectPath(ctx, cx - 530, groundY, 1060, 185, 18);
+  ctx.clip();
+  const soilG = ctx.createLinearGradient(0, groundY, 0, groundY + 185);
+  soilG.addColorStop(0, '#1B2E24');
+  soilG.addColorStop(0.25, '#191C12');
+  soilG.addColorStop(1, '#0F0D09');
+  ctx.fillStyle = soilG;
+  ctx.fillRect(cx - 530, groundY, 1060, 185);
+  drawStrokeLine(ctx, cx - 530, groundY + 4, cx + 530, groundY + 4, THEME.turqMid, 4);
+  ctx.restore();
+
+  ctx.font = '700 19px JetBrains';
+  ctx.fillStyle = THEME.ivoryMuted;
+  ctx.textAlign = 'left';
+  ctx.fillText('1 BUTIR BENIH DITANAM', cx - 500, groundY + 34);
+
+  // Animated Root Tendrils branching downward
+  const rootP = easeOutCubic(clamp01((localT - 0.5) / 1.2));
+  if (rootP > 0.01) {
+    ctx.save();
+    ctx.strokeStyle = rgba(THEME.goldMedina, 0.7);
+    ctx.lineWidth = 3;
+    ctx.lineCap = 'round';
+    for (let r = -3; r <= 3; r++) {
+      const rx = cx + r * 38 * rootP;
+      const ry = seedY + (45 + (3 - Math.abs(r)) * 18) * rootP;
       ctx.beginPath();
-      ctx.arc(ox, oy, 18, 0, TAU);
+      ctx.moveTo(cx, seedY + 10);
+      ctx.quadraticCurveTo(cx + r * 14, seedY + 42, rx, ry);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  // Central Seed Capsule
+  const seedScale = springVal(localT - 0.2);
+  ctx.save();
+  ctx.translate(cx, seedY);
+  ctx.scale(seedScale, seedScale);
+  ctx.fillStyle = THEME.goldBright;
+  ctx.beginPath();
+  ctx.ellipse(0, 0, 24, 15, -0.15, 0, TAU);
+  ctx.fill();
+  ctx.strokeStyle = '#FFF5CC';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  ctx.restore();
+
+  // 7 Articulated Golden Stalks sprouting from the single seed
+  const stalkCount = 7;
+  const sproutP = easeOutCubic(clamp01((localT - 1.1) / 2.0));
+  if (sproutP > 0.01) {
+    for (let i = 0; i < stalkCount; i++) {
+      const norm = i - 3; // -3..3
+      const sp = clamp01((sproutP - Math.abs(norm) * 0.07) / 0.75);
+      if (sp <= 0.01) continue;
+
+      const sway = Math.sin(totalT * 1.3 + i * 0.6) * 8;
+      const tipX = cx + norm * 125 * sp + sway;
+      const len = (445 - Math.abs(norm) * 30) * sp;
+      const tipY = groundY - len;
+      const ctrlX = cx + norm * 32;
+      const ctrlY = groundY - len * 0.48;
+
+      // Primary stalk
+      const sg = ctx.createLinearGradient(cx, groundY, tipX, tipY);
+      sg.addColorStop(0, THEME.turqBright);
+      sg.addColorStop(0.45, THEME.goldMedina);
+      sg.addColorStop(1, THEME.goldBright);
+      ctx.strokeStyle = sg;
+      ctx.lineWidth = 5;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(cx, seedY - 8);
+      ctx.quadraticCurveTo(ctrlX, ctrlY, tipX, tipY);
+      ctx.stroke();
+
+      // Leaf blade at mid-height
+      if (sp > 0.45) {
+        const lx = lerp(cx, tipX, 0.48);
+        const ly = lerp(groundY, tipY, 0.48);
+        const dir = norm >= 0 ? 1 : -1;
+        ctx.fillStyle = rgba(THEME.turqMid, 0.85);
+        ctx.beginPath();
+        ctx.moveTo(lx, ly);
+        ctx.quadraticCurveTo(lx + dir * 48, ly - 24, lx + dir * 64, ly + 8);
+        ctx.quadraticCurveTo(lx + dir * 24, ly + 4, lx, ly);
+        ctx.fill();
+      }
+
+      // Golden Wheat Spike aligned along stalk tangent + Numbered Callout Tag (1..7)
+      if (sp > 0.72) {
+        const earP = clamp01((sp - 0.72) / 0.28);
+        const tangent = Math.atan2(tipY - ctrlY, tipX - ctrlX) + Math.PI / 2;
+        ctx.save();
+        ctx.translate(tipX, tipY);
+        ctx.rotate(tangent);
+        for (let g = 0; g < 6; g++) {
+          const gy = g * 14;
+          ctx.fillStyle = THEME.goldBright;
+          ctx.beginPath();
+          ctx.ellipse(-8, gy, 7 * earP, 11 * earP, -0.35, 0, TAU);
+          ctx.ellipse(8, gy, 7 * earP, 11 * earP, 0.35, 0, TAU);
+          ctx.fill();
+        }
+        ctx.restore();
+
+        // Crisp numbered badge above stalk tip
+        const badgeY = tipY - 46;
+        roundRectPath(ctx, tipX - 24, badgeY - 18, 48, 36, 10);
+        ctx.fillStyle = 'rgba(10, 26, 22, 0.96)';
+        ctx.fill();
+        ctx.strokeStyle = THEME.goldBright;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.font = '800 20px JetBrains';
+        ctx.fillStyle = THEME.goldBright;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(String(i + 1), tipX, badgeY + 1);
+      }
+    }
+  }
+
+  ctx.restore();
+}
+
+/**
+ * x08: Close-Up Wheat Ear + 10x10 Optical Loupe (7 x 100 = 700x Blueprint)
+ */
+export function drawWheatEarLoupe(ctx, cx, cy, localT) {
+  const enter = easeOutExpo(clamp01(localT / 0.65));
+  ctx.save();
+  ctx.globalAlpha = enter;
+
+  drawBevelCard(ctx, cx - 560, cy - 390, 1120, 780, {
+    radius: 28,
+    accent: THEME.goldBright,
+    headerLabel: 'DIAGNOSTIK PERKALIAN · 7 TANGKAI × 100 BIJI = 700×',
+  });
+
+  // Left: Detailed Sunbulah (Golden Wheat Ear)
+  const wx = cx - 365;
+  const wy = cy - 45;
+  drawStrokeLine(ctx, wx, wy + 205, wx, wy - 190, THEME.goldMedina, 7);
+  for (let row = 0; row < 9; row++) {
+    const ry = wy + 135 - row * 38;
+    const wSize = 1 - Math.abs(row - 4) * 0.08;
+    for (const side of [-1, 1]) {
+      ctx.save();
+      ctx.translate(wx + side * 24, ry);
+      ctx.rotate(side * 0.42);
+      ctx.fillStyle = row % 2 === 0 ? THEME.goldBright : THEME.goldMedina;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 17 * wSize, 29 * wSize, 0, 0, TAU);
+      ctx.fill();
+      ctx.strokeStyle = '#FFF5C2';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      ctx.restore();
+    }
+  }
+
+  // Clean horizontal connector between Wheat Ear & Loupe
+  const loupeX = cx + 255;
+  const loupeY = cy - 55;
+  const matP = easeOutCubic(clamp01((localT - 0.6) / 1.8));
+  drawStrokeLine(ctx, wx + 65, loupeY, loupeX - 195, loupeY, rgba(THEME.turqBright, 0.65), 3);
+  roundRectPath(ctx, cx - 255, loupeY - 24, 276, 48, 12);
+  ctx.fillStyle = 'rgba(8, 22, 19, 0.96)';
+  ctx.fill();
+  ctx.strokeStyle = rgba(THEME.turqBright, 0.78);
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  ctx.font = '700 21px JetBrains';
+  ctx.fillStyle = THEME.turqBright;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('1 TANGKAI = 100 BIJI', cx - 117, loupeY + 1);
+
+  // Optical Loupe Ring with 10x10 = 100 Illuminated Grains
+  ctx.save();
+  ctx.translate(loupeX, loupeY);
+  ctx.fillStyle = 'rgba(7, 20, 17, 0.96)';
+  ctx.beginPath();
+  ctx.arc(0, 0, 195, 0, TAU);
+  ctx.fill();
+  ctx.strokeStyle = THEME.goldBright;
+  ctx.lineWidth = 6;
+  ctx.stroke();
+  ctx.strokeStyle = rgba(THEME.turqBright, 0.45);
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(0, 0, 178, 0, TAU);
+  ctx.stroke();
+
+  const litCount = Math.round(matP * 100);
+  const startG = -117;
+  const cell = 26;
+  for (let r = 0; r < 10; r++) {
+    for (let c = 0; c < 10; c++) {
+      const idx = r * 10 + c;
+      const gx = startG + c * cell;
+      const gy = startG + r * cell;
+      const active = idx < litCount;
+      ctx.fillStyle = active ? THEME.goldBright : 'rgba(126, 142, 136, 0.22)';
+      ctx.beginPath();
+      ctx.ellipse(gx, gy, 7, 10, 0.2, 0, TAU);
       ctx.fill();
     }
+  }
+  ctx.restore();
 
-    // Badge above/below pan
-    const badgeY = dropLen + 88;
-    roundRectPath(ctx, -155, badgeY - 40, 310, 82, 20);
-    ctx.fillStyle = isRight ? 'rgba(9, 36, 28, 0.9)' : 'rgba(38, 14, 14, 0.85)';
+  // Bottom Equation Strip inside Card
+  const eqP = springVal(localT - 2.0);
+  if (eqP > 0.02) {
+    ctx.save();
+    ctx.globalAlpha = clamp01(eqP);
+    const eqY = cy + 255;
+    roundRectPath(ctx, cx - 490, eqY - 62, 980, 124, 20);
+    ctx.fillStyle = 'rgba(13, 35, 30, 0.96)';
     ctx.fill();
-    ctx.strokeStyle = isRight ? THEME.goldMedina : THEME.crimsonBright;
+    ctx.strokeStyle = THEME.goldBright;
+    ctx.lineWidth = 2.5;
+    ctx.stroke();
+
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = '800 46px Cinzel';
+    ctx.fillStyle = THEME.ivory;
+    ctx.fillText('7 TANGKAI  ×  100 BIJI  =  ', cx - 105, eqY + 2);
+    ctx.font = '900 56px Cinzel';
+    ctx.fillStyle = THEME.goldBright;
+    ctx.fillText('700×', cx + 330, eqY + 2);
+    ctx.restore();
+  }
+
+  ctx.restore();
+}
+
+/**
+ * x09: Altitude Breakthrough Gauge (Puasa Shattering 700x Ceiling -> Hilal Horizon)
+ */
+export function drawBreakthroughAltitudeMeter(ctx, cx, cy, localT, totalT) {
+  const enter = easeOutExpo(clamp01(localT / 0.6));
+  ctx.save();
+  ctx.globalAlpha = enter;
+
+  drawBevelCard(ctx, cx - 560, cy - 390, 1120, 780, {
+    radius: 28,
+    accent: THEME.turqBright,
+    headerLabel: 'PENGECUALIAN KHUSUS · PUASA MENEMBUS BATAS 700×',
+  });
+
+  // Left Vertical Altitude Gauge
+  const gx = cx - 320;
+  const gTop = cy - 260;
+  const gBot = cy + 310;
+  const gH = gBot - gTop;
+
+  roundRectPath(ctx, gx - 26, gTop, 52, gH, 26);
+  ctx.fillStyle = 'rgba(12, 27, 36, 0.95)';
+  ctx.fill();
+  ctx.strokeStyle = rgba(THEME.turqBright, 0.4);
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  const riseP = easeInOutQuart(clamp01((localT - 0.5) / 2.6));
+  const fillH = gH * riseP;
+  const fillGrad = ctx.createLinearGradient(0, gBot, 0, gTop);
+  fillGrad.addColorStop(0, THEME.turqMid);
+  fillGrad.addColorStop(0.55, THEME.goldBright);
+  fillGrad.addColorStop(1, '#FFFFFF');
+  roundRectPath(ctx, gx - 18, gBot - fillH, 36, Math.max(24, fillH), 18);
+  ctx.fillStyle = fillGrad;
+  ctx.fill();
+
+  // Gauge ticks: 10x, 100x, 700x barrier (cleanly separated from Hilal above & Banner below)
+  const marks = [
+    { r: 0.18, label: '10×', col: THEME.ivoryMuted },
+    { r: 0.36, label: '100×', col: THEME.ivoryMuted },
+    { r: 0.56, label: 'BATAS 700×', col: THEME.crimsonBright, barrier: true },
+  ];
+  const breached = riseP > 0.56;
+
+  marks.forEach((m) => {
+    const my = gBot - gH * m.r;
+    if (m.barrier) {
+      const splitOffset = breached ? easeOutExpo(clamp01((riseP - 0.56) / 0.25)) * 22 : 0;
+      ctx.save();
+      ctx.globalAlpha = breached ? 0.8 : 1;
+      drawStrokeLine(ctx, gx - 55, my - splitOffset, cx + 10, my - splitOffset, THEME.crimsonBright, 4);
+      drawStrokeLine(ctx, cx + 320, my + splitOffset, cx + 490, my + splitOffset, THEME.crimsonBright, 4);
+      roundRectPath(ctx, cx + 30, my - 22, 270, 44, 10);
+      ctx.fillStyle = breached ? 'rgba(92, 27, 27, 0.85)' : 'rgba(92, 27, 27, 0.96)';
+      ctx.fill();
+      ctx.strokeStyle = THEME.crimsonBright;
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.font = '700 20px JetBrains';
+      ctx.fillStyle = '#FFD1D1';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(breached ? 'BATAS DITEMBUS' : 'BATAS 700×', cx + 165, my + 1);
+      ctx.restore();
+    } else {
+      drawStrokeLine(ctx, gx - 50, my, gx - 30, my, m.col, 2.5);
+      ctx.font = '700 22px JetBrains';
+      ctx.fillStyle = m.col;
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(m.label, gx - 60, my);
+    }
+  });
+
+  // Right Upper Zone: Illuminated Hilal Crescent (clear above barrier)
+  const hilalP = springVal(localT - 1.9);
+  const rx = cx + 165;
+  const ry = cy - 175;
+  ctx.save();
+  ctx.translate(rx, ry);
+  ctx.scale(hilalP, hilalP);
+
+  ctx.fillStyle = THEME.goldBright;
+  ctx.beginPath();
+  ctx.arc(0, 0, 74, 0.35 * Math.PI, 1.65 * Math.PI, false);
+  ctx.arc(32, -12, 60, 1.55 * Math.PI, 0.45 * Math.PI, true);
+  ctx.closePath();
+  ctx.fill();
+
+  drawRubElHizbBadge(ctx, 48, -20, 15, totalT * 0.3, THEME.turqBright, 2.2, THEME.turqBright);
+  ctx.restore();
+
+  // Direct Reward Banner below barrier
+  if (breached) {
+    const bp = easeOutExpo(clamp01((localT - 2.3) / 0.7));
+    ctx.save();
+    ctx.globalAlpha = bp;
+    roundRectPath(ctx, cx - 155, cy + 145, 640, 150, 22);
+    ctx.fillStyle = 'rgba(12, 37, 46, 0.96)';
+    ctx.fill();
+    ctx.strokeStyle = THEME.turqBright;
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = '900 50px Cinzel';
+    ctx.fillStyle = THEME.turqBright;
+    ctx.fillText('> 700×  ·  PUASA', cx + 165, cy + 195);
+    ctx.font = '600 23px Jakarta';
+    ctx.fillStyle = THEME.ivory;
+    ctx.fillText('Allah sendiri yang membalasnya secara langsung', cx + 165, cy + 250);
+    ctx.restore();
+  }
+
+  ctx.restore();
+}
+
+/**
+ * x10: Mechanical Limit (999...) vs Twin Pillars (PUASA + SABAR) & 3D Mobius Infinity Ribbon
+ */
+export function drawUnboundedAbacusAndRibbon(ctx, cx, cy, localT, totalT) {
+  const enter = easeOutExpo(clamp01(localT / 0.65));
+  ctx.save();
+  ctx.globalAlpha = enter;
+
+  drawBevelCard(ctx, cx - 560, cy - 390, 1120, 780, {
+    radius: 28,
+    accent: THEME.goldMedina,
+    headerLabel: 'BIGHAIRI HISAB · PAHALA TANPA ALAT HITUNG',
+  });
+
+  // Top Strip: Mechanical Counter Hitting Limit vs Unbounded
+  const topY = cy - 220;
+  roundRectPath(ctx, cx - 490, topY - 62, 430, 124, 18);
+  ctx.fillStyle = 'rgba(18, 28, 28, 0.92)';
+  ctx.fill();
+  ctx.strokeStyle = rgba(THEME.crimsonBright, 0.45);
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.font = '700 19px JetBrains';
+  ctx.fillStyle = THEME.crimsonBright;
+  ctx.fillText('KALKULATOR TERBATAS', cx - 275, topY - 26);
+  ctx.font = '800 44px JetBrains';
+  ctx.fillStyle = THEME.ivoryMuted;
+  ctx.fillText('999.999...', cx - 275, topY + 20);
+  drawStrokeLine(ctx, cx - 410, topY + 20, cx - 140, topY + 20, THEME.crimsonBright, 4);
+
+  roundRectPath(ctx, cx + 60, topY - 62, 430, 124, 18);
+  ctx.fillStyle = 'rgba(16, 36, 32, 0.95)';
+  ctx.fill();
+  ctx.strokeStyle = THEME.goldBright;
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+  ctx.font = '700 19px JetBrains';
+  ctx.fillStyle = THEME.turqBright;
+  ctx.fillText('JANJI AL-QUR\'AN', cx + 275, topY - 26);
+  ctx.font = '900 42px Cinzel';
+  ctx.fillStyle = THEME.goldBright;
+  ctx.fillText('TANPA HISAB', cx + 275, topY + 20);
+
+  // Center: Twin Pillars (PUASA & SABAR) linked by 3D-shaded Infinity Lemniscate Ribbon
+  const pilY = cy + 120;
+  const p1 = springVal(localT - 0.5);
+  const p2 = springVal(localT - 0.9);
+
+  const drawPillar = (px, title, accent, p) => {
+    ctx.save();
+    ctx.globalAlpha = clamp01(p);
+    roundRectPath(ctx, px - 145, pilY - 190 * p, 290, 380 * p, 22);
+    const g = ctx.createLinearGradient(px, pilY - 190, px, pilY + 190);
+    g.addColorStop(0, rgba(accent, 0.3));
+    g.addColorStop(1, rgba(accent, 0.04));
+    ctx.fillStyle = g;
+    ctx.fill();
+    ctx.strokeStyle = rgba(accent, 0.75);
+    ctx.lineWidth = 2.5;
+    ctx.stroke();
+    ctx.font = '900 34px Cinzel';
+    ctx.fillStyle = accent;
+    ctx.textAlign = 'center';
+    ctx.fillText(title, px, pilY - 145);
+    ctx.restore();
+  };
+
+  drawPillar(cx - 250, 'PUASA', THEME.turqBright, p1);
+  drawPillar(cx + 250, 'SABAR', THEME.goldBright, p2);
+
+  // Swept Infinity Lemniscate Ribbon bridging both pillars
+  const ribP = easeOutCubic(clamp01((localT - 1.1) / 1.5));
+  if (ribP > 0.02) {
+    const steps = 160;
+    const maxStep = Math.floor(steps * ribP);
+    const pts = [];
+    for (let i = 0; i <= maxStep; i++) {
+      const a = (i / steps) * TAU;
+      const denom = 1 + Math.sin(a) * Math.sin(a);
+      const ix = cx + (380 * Math.cos(a)) / denom;
+      const iy = pilY + 20 + (320 * Math.sin(a) * Math.cos(a)) / denom;
+      pts.push({ x: ix, y: iy });
+    }
+    if (pts.length > 1) {
+      // Dark under-ribbon
+      ctx.strokeStyle = 'rgba(4, 13, 11, 0.9)';
+      ctx.lineWidth = 34;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      pts.forEach((pt, idx) => (idx === 0 ? ctx.moveTo(pt.x, pt.y) : ctx.lineTo(pt.x, pt.y)));
+      ctx.stroke();
+
+      // Main metallic ribbon
+      const rg = ctx.createLinearGradient(cx - 380, pilY, cx + 380, pilY);
+      rg.addColorStop(0, THEME.turqBright);
+      rg.addColorStop(0.5, THEME.goldBright);
+      rg.addColorStop(1, THEME.turqBright);
+      ctx.strokeStyle = rg;
+      ctx.lineWidth = 18;
+      ctx.beginPath();
+      pts.forEach((pt, idx) => (idx === 0 ? ctx.moveTo(pt.x, pt.y) : ctx.lineTo(pt.x, pt.y)));
+      ctx.stroke();
+
+      // Specular inner thread
+      ctx.strokeStyle = '#FFFFFF';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      pts.forEach((pt, idx) => (idx === 0 ? ctx.moveTo(pt.x, pt.y) : ctx.lineTo(pt.x, pt.y)));
+      ctx.stroke();
+
+      // Traveling highlight bead
+      const hIdx = Math.floor(((totalT * 0.45) % 1) * (pts.length - 1));
+      const hp = pts[hIdx];
+      ctx.fillStyle = '#FFFFFF';
+      ctx.beginPath();
+      ctx.arc(hp.x, hp.y, 10, 0, TAU);
+      ctx.fill();
+    }
+  }
+
+  ctx.restore();
+}
+
+/**
+ * x11: Editorial Historical Cartography Map (Syam -> Madinah) + Laden Camels + 1.000 Counter
+ */
+export function drawSyamMadinahMap(ctx, cx, cy, localT, totalT) {
+  const enter = easeOutExpo(clamp01(localT / 0.65));
+  ctx.save();
+  ctx.globalAlpha = enter;
+
+  // Top Odometer: 0 -> 1.000 UNTA
+  const cntP = easeOutExpo(clamp01((localT - 0.3) / 1.8));
+  const val = Math.round(lerp(0, 1000, cntP));
+  const valStr = val === 1000 ? '1.000' : String(val);
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.font = '900 148px Cinzel';
+  ctx.fillStyle = THEME.goldBright;
+  ctx.fillText(valStr, cx, cy - 385);
+  ctx.font = '700 24px JetBrains';
+  ctx.fillStyle = THEME.ivory;
+  ctx.fillText('UNTA KAFILAH DAGANG · GANDUM & MINYAK ZAITUN', cx, cy - 285);
+
+  // Historical Cartography Frame
+  const mapX = cx - 560;
+  const mapY = cy - 220;
+  const mapW = 1120;
+  const mapH = 680;
+  drawBevelCard(ctx, mapX, mapY, mapW, mapH, {
+    radius: 26,
+    accent: THEME.goldMedina,
+    bgTop: 'rgba(26, 22, 13, 0.94)',
+    bgBot: 'rgba(13, 11, 7, 0.98)',
+    headerLabel: 'PETA JALUR KAFILAH · SYAM MENUJU MADINAH AL-MUNAWWARAH',
+  });
+
+  // Topographic Contour Rings inside map
+  ctx.save();
+  roundRectPath(ctx, mapX + 16, mapY + 60, mapW - 32, mapH - 76, 18);
+  ctx.clip();
+  ctx.strokeStyle = rgba(THEME.goldMedina, 0.14);
+  ctx.lineWidth = 1.6;
+  for (let c = 1; c <= 5; c++) {
+    ctx.beginPath();
+    ctx.ellipse(mapX + 260, mapY + 230, c * 90, c * 52, 0.25, 0, TAU);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.ellipse(mapX + 860, mapY + 480, c * 100, c * 58, -0.2, 0, TAU);
+    ctx.stroke();
+  }
+
+  // Compass Rose (Top Right of Map)
+  const crX = mapX + mapW - 110;
+  const crY = mapY + 145;
+  ctx.strokeStyle = rgba(THEME.goldMedina, 0.55);
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.arc(crX, crY, 42, 0, TAU);
+  ctx.stroke();
+  drawStrokeLine(ctx, crX, crY - 52, crX, crY + 52, THEME.goldBright, 2);
+  drawStrokeLine(ctx, crX - 52, crY, crX + 52, crY, THEME.goldMedina, 1.5);
+  ctx.font = '700 16px JetBrains';
+  ctx.fillStyle = THEME.goldBright;
+  ctx.fillText('U', crX, crY - 62);
+
+  // Route Bezier from Syam (North-West) -> Madinah (South-East)
+  const sx = mapX + 175;
+  const sy = mapY + 215;
+  const mx = mapX + mapW - 185;
+  const my = mapY + 465;
+  const c1x = mapX + 490;
+  const c1y = mapY + 150;
+  const c2x = mapX + 640;
+  const c2y = mapY + 510;
+
+  // Base faint route track
+  ctx.save();
+  ctx.setLineDash([12, 10]);
+  ctx.strokeStyle = rgba(THEME.ivoryMuted, 0.28);
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(sx, sy);
+  ctx.bezierCurveTo(c1x, c1y, c2x, c2y, mx, my);
+  ctx.stroke();
+  ctx.restore();
+
+  // Animated progress path
+  const routeP = easeInOutQuart(clamp01((localT - 0.5) / 3.2));
+  const steps = 60;
+  const maxI = Math.floor(steps * routeP);
+  const routePts = [];
+  for (let i = 0; i <= maxI; i++) {
+    const u = i / steps;
+    const iu = 1 - u;
+    routePts.push({
+      x: iu * iu * iu * sx + 3 * iu * iu * u * c1x + 3 * iu * u * u * c2x + u * u * u * mx,
+      y: iu * iu * iu * sy + 3 * iu * iu * u * c1y + 3 * iu * u * u * c2y + u * u * u * my,
+    });
+  }
+  if (routePts.length > 1) {
+    ctx.strokeStyle = THEME.turqBright;
+    ctx.lineWidth = 6;
+    ctx.beginPath();
+    routePts.forEach((pt, idx) => (idx === 0 ? ctx.moveTo(pt.x, pt.y) : ctx.lineTo(pt.x, pt.y)));
+    ctx.stroke();
+  }
+
+  // City Pins: SYAM & MADINAH
+  const drawCityPin = (px, py, name, sub, col) => {
+    ctx.fillStyle = col;
+    ctx.beginPath();
+    ctx.arc(px, py, 14, 0, TAU);
+    ctx.fill();
+    ctx.strokeStyle = '#FFFFFF';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    roundRectPath(ctx, px - 105, py + 24, 210, 68, 12);
+    ctx.fillStyle = 'rgba(10, 18, 16, 0.94)';
+    ctx.fill();
+    ctx.strokeStyle = col;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.font = '800 22px JetBrains';
+    ctx.fillStyle = col;
+    ctx.fillText(name, px, py + 48);
+    ctx.font = '500 18px Jakarta';
+    ctx.fillStyle = THEME.ivoryMuted;
+    ctx.fillText(sub, px, py + 74);
+  };
+  drawCityPin(sx, sy, 'SYAM', 'Titik Muat Kafilah', THEME.goldBright);
+  drawCityPin(mx, my, 'MADINAH', 'Dilanda Paceklik', THEME.turqBright);
+
+  // Silhouette Caravan strip along bottom of map
+  const duneY = mapY + mapH - 65;
+  ctx.fillStyle = '#090805';
+  ctx.beginPath();
+  ctx.moveTo(mapX, mapY + mapH);
+  ctx.lineTo(mapX, duneY);
+  ctx.quadraticCurveTo(cx, duneY - 28, mapX + mapW, duneY + 12);
+  ctx.lineTo(mapX + mapW, mapY + mapH);
+  ctx.closePath();
+  ctx.fill();
+
+  const drawCamel = (x, y, s, walk) => {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(s, s);
+    ctx.fillStyle = THEME.goldMedina;
+    // Loaded packs (grain sacks) on hump
+    roundRectPath(ctx, -20, -48, 34, 22, 6);
+    ctx.fillStyle = THEME.turqMid;
+    ctx.fill();
+    // Body & neck
+    ctx.fillStyle = THEME.goldBright;
+    ctx.beginPath();
+    ctx.ellipse(0, -24, 24, 14, 0, 0, TAU);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(16, -24);
+    ctx.quadraticCurveTo(32, -32, 34, -52);
+    ctx.lineTo(44, -52);
+    ctx.lineTo(44, -44);
+    ctx.quadraticCurveTo(36, -42, 24, -18);
+    ctx.fill();
+    // Legs
+    const sw = Math.sin(walk) * 5;
+    drawStrokeLine(ctx, -14, -14, -16 + sw, 6, THEME.goldBright, 4);
+    drawStrokeLine(ctx, -6, -14, -6 - sw, 6, THEME.goldBright, 4);
+    drawStrokeLine(ctx, 10, -14, 10 + sw, 6, THEME.goldBright, 4);
+    drawStrokeLine(ctx, 18, -14, 18 - sw, 6, THEME.goldBright, 4);
+    ctx.restore();
+  };
+
+  for (let i = 0; i < 6; i++) {
+    const cxPos = mapX + 160 + ((i * 155 + totalT * 42) % (mapW - 260));
+    drawCamel(cxPos, duneY - 6, 0.92, totalT * 6 + i * 1.1);
+  }
+
+  ctx.restore();
+  ctx.restore();
+}
+
+/**
+ * x12: Editorial Bid Rejection Sequence (2x -> 5x DITOLAK) vs Covenant (10x-700x) & Free Grain Distribution
+ */
+export function drawAuctionOfferSequence(ctx, cx, cy, localT) {
+  const enter = easeOutExpo(clamp01(localT / 0.6));
+  ctx.save();
+  ctx.globalAlpha = enter;
+
+  // Left Card: Merchant Bids (2x -> 3x -> 5x) Stamped DITOLAK
+  const lx = cx - 285;
+  const cardY = cy - 110;
+  drawBevelCard(ctx, lx - 255, cardY - 210, 510, 420, {
+    radius: 24,
+    accent: THEME.crimsonBright,
+    headerLabel: 'TAWARAN PARA PEDAGANG',
+  });
+
+  const bids = [
+    { txt: 'UNTUNG 2× LIPAT', p: stagger(localT - 0.3, 0, 0.35) },
+    { txt: 'UNTUNG 3× LIPAT', p: stagger(localT - 0.3, 1, 0.35) },
+    { txt: 'UNTUNG 5× LIPAT', p: stagger(localT - 0.3, 2, 0.35) },
+  ];
+  bids.forEach((b, idx) => {
+    if (b.p <= 0.02) return;
+    const by = cardY - 82 + idx * 96;
+    ctx.save();
+    ctx.globalAlpha = easeOutCubic(b.p);
+    roundRectPath(ctx, lx - 215, by - 34, 430, 68, 14);
+    ctx.fillStyle = idx === 2 ? 'rgba(60, 22, 22, 0.94)' : 'rgba(28, 22, 22, 0.9)';
+    ctx.fill();
+    ctx.strokeStyle = rgba(THEME.crimsonBright, 0.55);
     ctx.lineWidth = 2;
     ctx.stroke();
 
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.font = '800 32px Cinzel';
-    ctx.fillStyle = isRight ? THEME.goldBright : THEME.crimsonBright;
-    ctx.fillText(info.value, 0, badgeY - 11);
-
-    ctx.font = '600 22px Jakarta';
+    ctx.font = '800 30px Jakarta';
     ctx.fillStyle = THEME.ivory;
-    ctx.fillText(info.label, 0, badgeY + 20);
-
+    ctx.fillText(b.txt, lx, by + 1);
     ctx.restore();
-  };
-
-  drawPan(-halfArm, leftInfo, false);
-  drawPan(halfArm, rightInfo, true);
-  ctx.restore();
-
-  // Center fulcrum jewel
-  ctx.fillStyle = THEME.goldBright;
-  ctx.beginPath();
-  ctx.arc(0, topPivotY, 16, 0, TAU);
-  ctx.fill();
-  ctx.strokeStyle = THEME.bgObsidian;
-  ctx.lineWidth = 3;
-  ctx.stroke();
-
-  ctx.restore();
-}
-
-export function drawBotanicalSeedTree(ctx, cx, baseY, seedDropP, branchP, grainBurstP, t) {
-  ctx.save();
-  ctx.translate(cx, baseY);
-
-  // Fertile glowing earth mound
-  const moundW = 540;
-  const earthGrad = ctx.createRadialGradient(0, 0, 10, 0, 0, moundW);
-  earthGrad.addColorStop(0, rgba(THEME.goldMedina, 0.35));
-  earthGrad.addColorStop(0.5, rgba(THEME.turqMid, 0.14));
-  earthGrad.addColorStop(1, rgba(THEME.bgObsidian, 0));
-  ctx.fillStyle = earthGrad;
-  ctx.beginPath();
-  ctx.ellipse(0, 0, moundW, 74, 0, 0, TAU);
-  ctx.fill();
-
-  ctx.strokeStyle = rgba(THEME.goldMedina, 0.7);
-  ctx.lineWidth = 3;
-  ctx.beginPath();
-  ctx.moveTo(-moundW * 0.75, 0);
-  ctx.quadraticCurveTo(0, -24, moundW * 0.75, 0);
-  ctx.stroke();
-
-  // Single glowing seed
-  const seedY = lerp(-260, -8, easeOutCubic(clamp01(seedDropP)));
-  const seedAura = ctx.createRadialGradient(0, seedY, 2, 0, seedY, 46);
-  seedAura.addColorStop(0, rgba(THEME.goldBright, 0.9));
-  seedAura.addColorStop(0.5, rgba(THEME.goldMedina, 0.3));
-  seedAura.addColorStop(1, rgba(THEME.goldMedina, 0));
-  ctx.fillStyle = seedAura;
-  ctx.beginPath();
-  ctx.arc(0, seedY, 46, 0, TAU);
-  ctx.fill();
-
-  ctx.fillStyle = THEME.goldBright;
-  ctx.beginPath();
-  ctx.ellipse(0, seedY, 13, 21, 0, 0, TAU);
-  ctx.fill();
-
-  // Golden roots below earth
-  if (branchP > 0.05) {
-    const rp = clamp01((branchP - 0.05) / 0.4);
-    ctx.strokeStyle = rgba(THEME.goldBurnished, 0.55 * rp);
-    ctx.lineWidth = 2.5;
-    for (let r = -2; r <= 2; r++) {
-      ctx.beginPath();
-      ctx.moveTo(0, 0);
-      ctx.quadraticCurveTo(r * 45 * rp, 35 * rp, r * 92 * rp, 68 * rp);
-      ctx.stroke();
-    }
-  }
-
-  // 7 Graceful Golden Wheat Stalks (QS. Al-Baqarah 2:261)
-  if (branchP > 0.01) {
-    const bp = easeOutCubic(clamp01(branchP));
-    const stalkAngles = [-0.54, -0.36, -0.18, 0, 0.18, 0.36, 0.54];
-    const stalkHeights = [540, 625, 695, 745, 695, 625, 540];
-
-    stalkAngles.forEach((ang, idx) => {
-      const stagger = clamp01((bp - Math.abs(idx - 3) * 0.08) / 0.72);
-      if (stagger <= 0.01) return;
-
-      const sway = Math.sin(t * 1.45 + idx * 0.85) * 14 * stagger;
-      const tipX = Math.sin(ang) * stalkHeights[idx] * stagger + sway;
-      const tipY = -Math.cos(ang) * stalkHeights[idx] * stagger;
-      const ctrlX = tipX * 0.42;
-      const ctrlY = tipY * 0.58;
-
-      // Stalk curve
-      const sGrad = ctx.createLinearGradient(0, 0, tipX, tipY);
-      sGrad.addColorStop(0, THEME.turqBright);
-      sGrad.addColorStop(0.45, THEME.goldMedina);
-      sGrad.addColorStop(1, THEME.goldBright);
-      ctx.strokeStyle = sGrad;
-      ctx.lineWidth = idx === 3 ? 6 : 4.5;
-      ctx.lineCap = 'round';
-      ctx.shadowColor = rgba(THEME.goldMedina, 0.4);
-      ctx.shadowBlur = 10;
-      ctx.beginPath();
-      ctx.moveTo(0, -10);
-      ctx.quadraticCurveTo(ctrlX, ctrlY, tipX, tipY);
-      ctx.stroke();
-      ctx.shadowBlur = 0;
-
-      // Wheat ear & 100-grain bloom at tip
-      if (stagger > 0.55) {
-        const earP = clamp01((stagger - 0.55) / 0.45);
-        ctx.save();
-        ctx.translate(tipX, tipY);
-        ctx.rotate(ang * 0.75);
-
-        // Glowing aura around wheat ear
-        const eAura = ctx.createRadialGradient(0, -36, 4, 0, -36, 86 * earP);
-        eAura.addColorStop(0, rgba(THEME.goldBright, 0.42 * earP));
-        eAura.addColorStop(1, rgba(THEME.goldMedina, 0));
-        ctx.fillStyle = eAura;
-        ctx.beginPath();
-        ctx.arc(0, -36, 86 * earP, 0, TAU);
-        ctx.fill();
-
-        // Layered golden wheat kernels along the ear
-        const pairCount = 7;
-        for (let k = 0; k < pairCount; k++) {
-          const ky = -k * 13 * earP;
-          const kw = (1 - k / (pairCount + 2)) * 13 * earP;
-          const kh = 20 * earP;
-          ctx.fillStyle = k % 2 === 0 ? THEME.goldBright : THEME.goldMedina;
-          ctx.beginPath();
-          ctx.ellipse(-kw, ky, 6.5 * earP, kh * 0.5, -0.45, 0, TAU);
-          ctx.fill();
-          ctx.beginPath();
-          ctx.ellipse(kw, ky, 6.5 * earP, kh * 0.5, 0.45, 0, TAU);
-          ctx.fill();
-        }
-
-        // Sparkling 100-grain constellation burst when grainBurstP > 0
-        if (grainBurstP > 0.01) {
-          const gp = easeOutExpo(clamp01(grainBurstP));
-          const rnd = mulberry32(700 + idx * 31);
-          for (let g = 0; g < 18; g++) {
-            const ga = rnd() * TAU;
-            const gr = (18 + rnd() * 68) * gp;
-            const gx = Math.cos(ga) * gr;
-            const gy = -42 + Math.sin(ga) * gr;
-            const gAlpha = (0.45 + 0.55 * Math.sin(t * 4 + g + idx)) * gp;
-            ctx.fillStyle = rgba(THEME.goldBright, gAlpha);
-            ctx.beginPath();
-            ctx.arc(gx, gy, 2.2 + rnd() * 2.5, 0, TAU);
-            ctx.fill();
-          }
-
-          // "100" badge above each stalk
-          ctx.save();
-          ctx.rotate(-ang * 0.75);
-          ctx.globalAlpha = gp;
-          roundRectPath(ctx, -40, -138, 80, 34, 17);
-          ctx.fillStyle = 'rgba(6, 22, 18, 0.88)';
-          ctx.fill();
-          ctx.strokeStyle = THEME.goldMedina;
-          ctx.lineWidth = 1.6;
-          ctx.stroke();
-          ctx.font = '800 20px JetBrains';
-          ctx.fillStyle = THEME.goldBright;
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
-          ctx.fillText('100', 0, -120);
-          ctx.restore();
-        }
-
-        ctx.restore();
-      }
-    });
-  }
-
-  ctx.restore();
-}
-
-export function drawExponentialStaircase(ctx, cx, baseY, progress, t) {
-  const p = clamp01(progress);
-  const steps = [
-    { label: '1×', sub: 'Niat', h: 120, col: THEME.turqMid },
-    { label: '10×', sub: 'Minimal', h: 250, col: THEME.turqBright },
-    { label: '100×', sub: 'Bertumbuh', h: 410, col: THEME.goldMedina },
-    { label: '700×', sub: 'Al-Baqarah', h: 610, col: THEME.goldBright },
-    { label: '∞', sub: 'Tak Terhingga', h: 780, col: '#FFFFFF' },
-  ];
-
-  const colW = 164;
-  const gap = 38;
-  const totalW = steps.length * colW + (steps.length - 1) * gap;
-  const startX = cx - totalW / 2;
-
-  ctx.save();
-  // Subtle baseline
-  drawGlowingLine(ctx, startX - 40, baseY, startX + totalW + 40, baseY, rgba(THEME.goldMedina, 0.55), 3, 10);
-
-  const tops = [];
-  steps.forEach((st, i) => {
-    const sp = easeOutBack(clamp01((p - i * 0.14) / 0.44), 1.15);
-    const x = startX + i * (colW + gap);
-    const h = st.h * Math.max(0.02, sp);
-    const y = baseY - h;
-    tops.push({ x: x + colW / 2, y });
-
-    if (sp > 0.02) {
-      roundRectPath(ctx, x, y, colW, h, 20);
-      const g = ctx.createLinearGradient(x, y, x, baseY);
-      g.addColorStop(0, rgba(st.col, 0.92));
-      g.addColorStop(0.35, rgba(st.col, 0.38));
-      g.addColorStop(1, rgba(THEME.bgEmeraldDeep, 0.2));
-      ctx.fillStyle = g;
-      ctx.fill();
-
-      ctx.strokeStyle = rgba(st.col, 0.85);
-      ctx.lineWidth = 2.4;
-      ctx.stroke();
-
-      // Pillar crown label
-      ctx.globalAlpha = clamp01(sp);
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.font = '900 44px Cinzel';
-      ctx.fillStyle = st.col;
-      ctx.shadowColor = rgba(st.col, 0.5);
-      ctx.shadowBlur = 16;
-      ctx.fillText(st.label, x + colW / 2, y - 42);
-      ctx.shadowBlur = 0;
-
-      ctx.font = '700 22px Jakarta';
-      ctx.fillStyle = THEME.ivory;
-      ctx.fillText(st.sub, x + colW / 2, baseY + 34);
-      ctx.globalAlpha = 1;
-    }
   });
 
-  // Sweeping exponential light curve connecting tops
-  if (p > 0.25 && tops.length >= 2) {
+  // Snappy DITOLAK Stamp over merchant card
+  const stampP = springVal(localT - 1.7, 280, 16);
+  if (stampP > 0.02) {
     ctx.save();
-    ctx.strokeStyle = THEME.goldBright;
-    ctx.lineWidth = 5;
-    ctx.shadowColor = rgba(THEME.goldMedina, 0.75);
-    ctx.shadowBlur = 20;
-    ctx.beginPath();
-    ctx.moveTo(tops[0].x, tops[0].y - 8);
-    for (let i = 1; i < tops.length; i++) {
-      const prev = tops[i - 1];
-      const cur = tops[i];
-      const midX = (prev.x + cur.x) / 2;
-      ctx.bezierCurveTo(midX, prev.y - 8, midX, cur.y - 8, cur.x, cur.y - 8);
-    }
+    ctx.translate(lx, cardY + 25);
+    ctx.rotate(-0.18);
+    ctx.scale(lerp(1.7, 1.0, stampP), lerp(1.7, 1.0, stampP));
+    ctx.globalAlpha = clamp01(stampP);
+    roundRectPath(ctx, -165, -46, 330, 92, 14);
+    ctx.fillStyle = 'rgba(165, 29, 29, 0.94)';
+    ctx.fill();
+    ctx.strokeStyle = '#FFD0D0';
+    ctx.lineWidth = 4;
     ctx.stroke();
+    ctx.font = '900 44px Cinzel';
+    ctx.fillStyle = '#FFFFFF';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('DITOLAK', 0, 2);
     ctx.restore();
   }
 
-  // Rising spark orb along the top
-  const pulseIdx = (t * 0.9) % 1;
-  const activeTop = tops[Math.min(tops.length - 1, Math.floor(pulseIdx * tops.length))];
-  if (activeTop) {
-    drawFourPointStar(ctx, activeTop.x, activeTop.y - 10, 18, 0.9, '#FFFFFF', t * 2);
-  }
+  // Right Card: Covenant with Allah (10x - 700x)
+  const rx = cx + 285;
+  const rightP = springVal(localT - 2.1);
+  if (rightP > 0.02) {
+    ctx.save();
+    ctx.globalAlpha = clamp01(rightP);
+    drawBevelCard(ctx, rx - 255, cardY - 210, 510, 420, {
+      radius: 24,
+      accent: THEME.goldBright,
+      headerLabel: 'TAWARAN ALLAH AZZA WA JALLA',
+    });
 
-  ctx.restore();
-}
-
-export function drawIlluminatedManuscript(ctx, cx, cy, w, h, openP, t) {
-  const p = easeOutExpo(clamp01(openP));
-  if (p <= 0.01) return;
-
-  ctx.save();
-  ctx.translate(cx, cy);
-  const floatY = Math.sin(t * 1.4) * 8;
-  ctx.translate(0, floatY);
-
-  const curW = w * (0.25 + 0.75 * p);
-  const x = -curW / 2;
-  const y = -h / 2;
-
-  // Manuscript outer shadow & leather spine
-  roundRectPath(ctx, x - 18, y - 16, curW + 36, h + 32, 32);
-  ctx.fillStyle = 'rgba(20, 14, 6, 0.88)';
-  ctx.shadowColor = rgba(THEME.goldMedina, 0.3);
-  ctx.shadowBlur = 35;
-  ctx.fill();
-  ctx.shadowBlur = 0;
-  ctx.strokeStyle = THEME.goldBurnished;
-  ctx.lineWidth = 3;
-  ctx.stroke();
-
-  // Parchment twin pages
-  const halfW = curW / 2 - 12;
-  for (let side of [-1, 1]) {
-    const px = side < 0 ? -curW / 2 + 6 : 6;
-    roundRectPath(ctx, px, y + 6, halfW, h - 12, 18);
-    const pg = ctx.createLinearGradient(px, y, px + halfW, y + h);
-    pg.addColorStop(0, '#132E26');
-    pg.addColorStop(0.5, '#0B1F1B');
-    pg.addColorStop(1, '#081714');
-    ctx.fillStyle = pg;
-    ctx.fill();
-    ctx.strokeStyle = rgba(THEME.goldMedina, 0.6);
-    ctx.lineWidth = 1.8;
-    ctx.stroke();
-
-    // Decorative gold ruled lines & margin medallion
-    ctx.strokeStyle = rgba(THEME.goldMedina, 0.2);
-    ctx.lineWidth = 1.2;
-    for (let l = 1; l <= 6; l++) {
-      const ly = y + 48 + l * ((h - 96) / 7);
-      ctx.beginPath();
-      ctx.moveTo(px + 28, ly);
-      ctx.lineTo(px + halfW - 28, ly);
-      ctx.stroke();
-    }
-    drawRubElHizb(ctx, px + halfW / 2, y + h * 0.25, 34, t * 0.2 * side, rgba(THEME.goldBright, 0.45), 1.6);
-  }
-
-  // Center golden gutter crease
-  const spineGrad = ctx.createLinearGradient(-16, 0, 16, 0);
-  spineGrad.addColorStop(0, 'rgba(0,0,0,0)');
-  spineGrad.addColorStop(0.5, 'rgba(0,0,0,0.65)');
-  spineGrad.addColorStop(1, 'rgba(0,0,0,0)');
-  ctx.fillStyle = spineGrad;
-  ctx.fillRect(-16, y + 6, 32, h - 12);
-
-  ctx.restore();
-}
-
-export function drawCamelSilhouette(ctx, x, y, scale, stridePhase) {
-  ctx.save();
-  ctx.translate(x, y);
-  ctx.scale(scale, scale);
-
-  const bob = Math.sin(stridePhase * 2) * 2.2;
-  const legSwing = Math.sin(stridePhase) * 8;
-
-  ctx.fillStyle = '#040B09';
-  ctx.strokeStyle = rgba(THEME.goldMedina, 0.55);
-  ctx.lineWidth = 1.4;
-
-  // Body & hump
-  ctx.beginPath();
-  ctx.moveTo(-26, -12 + bob);
-  ctx.quadraticCurveTo(-18, -32 + bob, -4, -36 + bob);
-  ctx.quadraticCurveTo(10, -34 + bob, 18, -18 + bob);
-  // Neck & head
-  ctx.quadraticCurveTo(28, -20 + bob, 32, -34 + bob);
-  ctx.quadraticCurveTo(36, -42 + bob, 44, -40 + bob);
-  ctx.quadraticCurveTo(48, -36 + bob, 42, -32 + bob);
-  ctx.quadraticCurveTo(35, -14 + bob, 22, -4 + bob);
-  ctx.lineTo(-22, -4 + bob);
-  ctx.closePath();
-  ctx.fill();
-  ctx.stroke();
-
-  // Legs
-  const legs = [
-    { lx: -16, off: legSwing },
-    { lx: -8, off: -legSwing },
-    { lx: 12, off: -legSwing * 0.8 },
-    { lx: 19, off: legSwing * 0.8 },
-  ];
-  ctx.lineWidth = 4.5;
-  ctx.strokeStyle = '#040B09';
-  for (const lg of legs) {
-    ctx.beginPath();
-    ctx.moveTo(lg.lx, -6 + bob);
-    ctx.lineTo(lg.lx + lg.off * 0.5, 16);
-    ctx.lineTo(lg.lx + lg.off, 34);
-    ctx.stroke();
-  }
-
-  ctx.restore();
-}
-
-export function drawCaravanTwilight(ctx, cx, horizonY, progress, t) {
-  const p = easeOutExpo(clamp01(progress));
-  ctx.save();
-  ctx.globalAlpha = p;
-
-  // Twilight desert sun/moon glow behind dunes
-  const sunG = ctx.createRadialGradient(cx, horizonY - 120, 20, cx, horizonY - 120, 420);
-  sunG.addColorStop(0, rgba(THEME.goldBright, 0.45));
-  sunG.addColorStop(0.4, rgba(THEME.goldMedina, 0.16));
-  sunG.addColorStop(1, rgba(THEME.goldMedina, 0));
-  ctx.fillStyle = sunG;
-  ctx.fillRect(0, horizonY - 560, WIDTH, 680);
-
-  // Distant Madinah dome & minaret silhouettes
-  ctx.fillStyle = rgba(THEME.bgEmeraldSoft, 0.65);
-  ctx.beginPath();
-  ctx.arc(WIDTH * 0.78, horizonY - 40, 56, Math.PI, 0);
-  ctx.lineTo(WIDTH * 0.78 + 70, horizonY + 40);
-  ctx.lineTo(WIDTH * 0.78 - 70, horizonY + 40);
-  ctx.closePath();
-  ctx.fill();
-  // Minaret
-  ctx.fillRect(WIDTH * 0.78 + 82, horizonY - 165, 14, 190);
-  ctx.beginPath();
-  ctx.arc(WIDTH * 0.78 + 89, horizonY - 165, 11, Math.PI, 0);
-  ctx.fill();
-
-  // Back dune ridge
-  const dune1 = ctx.createLinearGradient(0, horizonY - 90, 0, horizonY + 260);
-  dune1.addColorStop(0, '#1B2D24');
-  dune1.addColorStop(1, '#061411');
-  ctx.fillStyle = dune1;
-  ctx.beginPath();
-  ctx.moveTo(0, horizonY + 280);
-  ctx.lineTo(0, horizonY - 20);
-  ctx.bezierCurveTo(380, horizonY - 110, 820, horizonY + 30, WIDTH, horizonY - 55);
-  ctx.lineTo(WIDTH, horizonY + 280);
-  ctx.closePath();
-  ctx.fill();
-
-  // Animated caravan of camels walking right-to-left or left-to-right across ridge
-  const travel = (t * 42) % 320;
-  for (let i = 0; i < 6; i++) {
-    const camX = 180 + i * 195 + travel - 120;
-    const ridgeT = clamp01(camX / WIDTH);
-    const camY = horizonY - 38 - Math.sin(ridgeT * Math.PI) * 26;
-    drawCamelSilhouette(ctx, camX, camY, 1.38, t * 4.5 + i * 1.1);
-  }
-
-  // Foreground dune with golden rim highlight
-  const dune2 = ctx.createLinearGradient(0, horizonY + 10, 0, horizonY + 340);
-  dune2.addColorStop(0, '#12221C');
-  dune2.addColorStop(1, '#030A09');
-  ctx.fillStyle = dune2;
-  ctx.beginPath();
-  ctx.moveTo(0, horizonY + 340);
-  ctx.lineTo(0, horizonY + 45);
-  ctx.bezierCurveTo(450, horizonY + 125, 960, horizonY - 15, WIDTH, horizonY + 70);
-  ctx.lineTo(WIDTH, horizonY + 340);
-  ctx.closePath();
-  ctx.fill();
-
-  ctx.strokeStyle = rgba(THEME.goldMedina, 0.55);
-  ctx.lineWidth = 2.5;
-  ctx.beginPath();
-  ctx.moveTo(0, horizonY + 45);
-  ctx.bezierCurveTo(450, horizonY + 125, 960, horizonY - 15, WIDTH, horizonY + 70);
-  ctx.stroke();
-
-  // Telemetry route arc SYAM -> MADINAH
-  const arcY = horizonY - 250;
-  ctx.strokeStyle = rgba(THEME.turqBright, 0.65);
-  ctx.setLineDash([10, 10]);
-  ctx.lineDashOffset = -t * 45;
-  ctx.lineWidth = 2.5;
-  ctx.beginPath();
-  ctx.moveTo(240, arcY + 80);
-  ctx.quadraticCurveTo(WIDTH / 2, arcY - 90, WIDTH - 240, arcY + 80);
-  ctx.stroke();
-  ctx.setLineDash([]);
-
-  for (const pt of [
-    { x: 240, label: 'SYAM', sub: 'Kafilah Dagang' },
-    { x: WIDTH - 240, label: 'MADINAH', sub: '1.000 Unta' },
-  ]) {
-    ctx.fillStyle = THEME.turqBright;
-    ctx.beginPath();
-    ctx.arc(pt.x, arcY + 80, 10, 0, TAU);
-    ctx.fill();
-    ctx.font = '800 26px JetBrains';
     ctx.textAlign = 'center';
-    ctx.fillText(pt.label, pt.x, arcY + 120);
-    ctx.font = '600 22px Jakarta';
-    ctx.fillStyle = THEME.ivoryMuted;
-    ctx.fillText(pt.sub, pt.x, arcY + 150);
+    ctx.textBaseline = 'middle';
+    ctx.font = '900 84px Cinzel';
+    ctx.fillStyle = THEME.goldBright;
+    ctx.fillText('10×–700×', rx, cardY - 20);
+
+    ctx.font = '600 26px Jakarta';
+    ctx.fillStyle = THEME.ivory;
+    ctx.fillText('Balasan berlipat ganda tanpa rugi', rx, cardY + 62);
+
+    roundRectPath(ctx, rx - 185, cardY + 106, 370, 58, 14);
+    ctx.fillStyle = THEME.turqBright;
+    ctx.fill();
+    ctx.font = '800 24px JetBrains';
+    ctx.fillStyle = THEME.bgObsidian;
+    ctx.fillText('DIPILIH UTSMAN RA', rx, cardY + 136);
+    ctx.restore();
   }
 
-  ctx.restore();
-}
-
-export function drawComparisonBars(ctx, x, y, w, items, progress, t) {
-  const p = clamp01(progress);
-  ctx.save();
-  items.forEach((it, idx) => {
-    const ip = easeOutExpo(clamp01((p - idx * 0.16) / 0.55));
-    const iy = y + idx * 188;
-
-    ctx.globalAlpha = ip;
-    ctx.font = '700 30px Jakarta';
-    ctx.fillStyle = THEME.ivory;
+  // Bottom Distribution Banner: 100% Sedekah Gratis to Madinah Citizens
+  const distP = easeOutExpo(clamp01((localT - 3.0) / 0.8));
+  if (distP > 0.02) {
+    ctx.save();
+    ctx.globalAlpha = distP;
+    const dy = cy + 235;
+    drawBevelCard(ctx, cx - 540, dy - 75, 1080, 150, {
+      radius: 22,
+      accent: THEME.turqBright,
+    });
+    // 3 Golden Grain Crate Icons on the left
+    for (let k = 0; k < 3; k++) {
+      const kx = cx - 440 + k * 76;
+      roundRectPath(ctx, kx - 26, dy - 26, 52, 52, 10);
+      ctx.fillStyle = THEME.goldMedina;
+      ctx.fill();
+      drawStrokeLine(ctx, kx - 26, dy, kx + 26, dy, THEME.bgObsidian, 3);
+      drawStrokeLine(ctx, kx, dy - 26, kx, dy + 26, THEME.bgObsidian, 3);
+    }
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
-    ctx.fillText(it.label, x, iy);
+    ctx.font = '700 22px JetBrains';
+    ctx.fillStyle = THEME.turqBright;
+    ctx.fillText('AKSI NYATA DI MADINAH', cx - 220, dy - 26);
+    ctx.font = '800 36px Jakarta';
+    ctx.fillStyle = THEME.ivory;
+    ctx.fillText('1.000 Unta Muatan Dibagikan Gratis', cx - 220, dy + 20);
+    ctx.restore();
+  }
 
-    ctx.font = '800 34px Cinzel';
-    ctx.fillStyle = it.color;
-    ctx.textAlign = 'right';
-    ctx.fillText(it.valueLabel, x + w, iy);
-
-    // Track
-    const trackY = iy + 36;
-    const trackH = 44;
-    roundRectPath(ctx, x, trackY, w, trackH, 22);
-    ctx.fillStyle = 'rgba(10, 32, 27, 0.85)';
-    ctx.fill();
-    ctx.strokeStyle = rgba(it.color, 0.35);
-    ctx.lineWidth = 1.6;
-    ctx.stroke();
-
-    // Fill bar
-    const fillW = Math.max(44, w * it.ratio * ip);
-    roundRectPath(ctx, x, trackY, fillW, trackH, 22);
-    const bg = ctx.createLinearGradient(x, trackY, x + fillW, trackY);
-    bg.addColorStop(0, rgba(it.color, 0.55));
-    bg.addColorStop(1, it.color);
-    ctx.fillStyle = bg;
-    ctx.shadowColor = rgba(it.color, 0.45);
-    ctx.shadowBlur = 14;
-    ctx.fill();
-    ctx.shadowBlur = 0;
-
-    // Traveling shimmer along bar
-    const shimmerX = x + ((t * 180 + idx * 90) % Math.max(60, fillW));
-    const sg = ctx.createRadialGradient(shimmerX, trackY + trackH / 2, 2, shimmerX, trackY + trackH / 2, 50);
-    sg.addColorStop(0, rgba('#FFFFFF', 0.45));
-    sg.addColorStop(1, rgba('#FFFFFF', 0));
-    ctx.fillStyle = sg;
-    ctx.fillRect(x, trackY, fillW, trackH);
-  });
   ctx.restore();
 }
 
-export function drawDirhamScale(ctx, cx, cy, progress, t) {
-  const p = easeOutExpo(clamp01(progress));
-  const tilt = lerp(0.18, -0.24, easeOutCubic(clamp01((p - 0.25) / 0.55)));
+/**
+ * x13: Precision Split Infographic (Lifespan Ruler 950 vs 60-70 + 1 Gold Dirham vs 100.000 Silver Dirham)
+ */
+export function drawLifespanAndDirhamInfographic(ctx, cx, cy, localT) {
+  const enter = easeOutExpo(clamp01(localT / 0.6));
   ctx.save();
-  ctx.globalAlpha = p;
-  ctx.translate(cx, cy);
+  ctx.globalAlpha = enter;
+
+  // TOP PANEL: Lifespan Ruler Comparison
+  const topY = cy - 235;
+  drawBevelCard(ctx, cx - 560, topY - 190, 1120, 380, {
+    radius: 26,
+    accent: THEME.turqBright,
+    headerLabel: 'FAKTOR USIA · MENGAPA PAHALA UMAT INI DILIPATGANDAKAN',
+  });
+
+  const barX = cx - 490;
+  const barW = 980;
+  const p1 = easeOutExpo(clamp01((localT - 0.3) / 1.0));
+  const p2 = easeOutExpo(clamp01((localT - 0.7) / 1.0));
+
+  // Bar 1: Umat Terdahulu (~950 Tahun)
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  ctx.font = '700 24px Jakarta';
+  ctx.fillStyle = THEME.ivory;
+  ctx.fillText('UMAT TERDAHULU (NABI NUH AS)', barX, topY - 95);
+  ctx.textAlign = 'right';
+  ctx.font = '800 28px JetBrains';
+  ctx.fillStyle = THEME.turqBright;
+  ctx.fillText('± 950 TAHUN', barX + barW, topY - 95);
+
+  roundRectPath(ctx, barX, topY - 68, barW, 38, 12);
+  ctx.fillStyle = 'rgba(13, 30, 27, 0.9)';
+  ctx.fill();
+  roundRectPath(ctx, barX, topY - 68, Math.max(24, barW * 0.94 * p1), 38, 12);
+  ctx.fillStyle = THEME.turqMid;
+  ctx.fill();
+
+  // Bar 2: Umat Nabi Muhammad SAW (60-70 Tahun)
+  ctx.textAlign = 'left';
+  ctx.font = '700 24px Jakarta';
+  ctx.fillStyle = THEME.ivory;
+  ctx.fillText('UMAT NABI MUHAMMAD SAW', barX, topY + 12);
+  ctx.textAlign = 'right';
+  ctx.font = '800 28px JetBrains';
+  ctx.fillStyle = THEME.goldBright;
+  ctx.fillText('60 – 70 TAHUN', barX + barW, topY + 12);
+
+  roundRectPath(ctx, barX, topY + 38, barW, 38, 12);
+  ctx.fillStyle = 'rgba(13, 30, 27, 0.9)';
+  ctx.fill();
+  roundRectPath(ctx, barX, topY + 38, Math.max(24, barW * 0.14 * p2), 38, 12);
+  ctx.fillStyle = THEME.goldBright;
+  ctx.fill();
+
+  // Multiplier extension bracket showing Lailatul Qadar + 700x bridging the gap
+  const brP = easeOutCubic(clamp01((localT - 1.4) / 0.8));
+  if (brP > 0.02) {
+    ctx.save();
+    ctx.globalAlpha = brP;
+    const bx1 = barX + barW * 0.15;
+    const bx2 = lerp(bx1, barX + barW * 0.94, brP);
+    drawStrokeLine(ctx, bx1, topY + 95, bx2, topY + 95, THEME.goldBright, 3);
+    drawStrokeLine(ctx, bx1, topY + 85, bx1, topY + 105, THEME.goldBright, 3);
+    drawStrokeLine(ctx, bx2, topY + 85, bx2, topY + 105, THEME.goldBright, 3);
+
+    const lbl = 'DIKEJAR DENGAN PELIPATGANDAAN 700× & LAILATUL QADAR';
+    ctx.font = '700 20px JetBrains';
+    const pw = Math.min(940, ctx.measureText(lbl).width + 48);
+    const pxCenter = cx + 60;
+    roundRectPath(ctx, pxCenter - pw / 2, topY + 115, pw, 44, 12);
+    ctx.fillStyle = 'rgba(26, 22, 11, 0.96)';
+    ctx.fill();
+    ctx.strokeStyle = THEME.goldBright;
+    ctx.lineWidth = 1.8;
+    ctx.stroke();
+    ctx.textAlign = 'center';
+    ctx.fillStyle = THEME.goldBright;
+    ctx.fillText(lbl, pxCenter, topY + 138);
+    ctx.restore();
+  }
+
+  // BOTTOM PANEL: 1 Gold Dirham vs 100.000 Silver Dirham Fulcrum
+  const botY = cy + 215;
+  drawBevelCard(ctx, cx - 560, botY - 195, 1120, 390, {
+    radius: 26,
+    accent: THEME.goldMedina,
+    headerLabel: 'BERAT KEIKHLASAN · HR. AN-NASA\'I NO. 2527',
+  });
+
+  const tiltP = easeOutElastic(clamp01((localT - 2.3) / 1.4));
+  const tilt = lerp(0.08, -0.17, tiltP); // Left (1 Dirham) drops down heavier!
+  const pivY = botY + 128;
 
   // Fulcrum triangle
   ctx.fillStyle = THEME.goldMedina;
   ctx.beginPath();
-  ctx.moveTo(0, 120);
-  ctx.lineTo(-42, 195);
-  ctx.lineTo(42, 195);
+  ctx.moveTo(cx, pivY);
+  ctx.lineTo(cx - 32, pivY + 42);
+  ctx.lineTo(cx + 32, pivY + 42);
   ctx.closePath();
   ctx.fill();
 
-  // Tilting plank
   ctx.save();
-  ctx.translate(0, 120);
+  ctx.translate(cx, pivY);
   ctx.rotate(tilt);
 
-  roundRectPath(ctx, -430, -14, 860, 28, 14);
-  const plankG = ctx.createLinearGradient(-430, 0, 430, 0);
-  plankG.addColorStop(0, THEME.goldDeep);
-  plankG.addColorStop(0.5, THEME.goldBright);
-  plankG.addColorStop(1, THEME.goldDeep);
-  ctx.fillStyle = plankG;
+  // Lever Plank
+  roundRectPath(ctx, -430, -10, 860, 20, 8);
+  ctx.fillStyle = THEME.goldBright;
   ctx.fill();
 
-  // Left: Single luminous Dirham Ikhlas
-  const lx = -290;
-  const coinDrop = lerp(-240, -68, easeOutBack(clamp01((p - 0.1) / 0.45)));
-  const cGlow = ctx.createRadialGradient(lx, coinDrop, 10, lx, coinDrop, 120);
-  cGlow.addColorStop(0, rgba(THEME.goldBright, 0.55));
-  cGlow.addColorStop(1, rgba(THEME.goldMedina, 0));
-  ctx.fillStyle = cGlow;
-  ctx.beginPath();
-  ctx.arc(lx, coinDrop, 120, 0, TAU);
-  ctx.fill();
-
+  // Left: 1 Glowing Gold Dirham (50% dari harta si miskin)
   ctx.fillStyle = THEME.goldBright;
   ctx.beginPath();
-  ctx.arc(lx, coinDrop, 54, 0, TAU);
+  ctx.arc(-280, -64, 52, 0, TAU);
   ctx.fill();
-  ctx.strokeStyle = THEME.goldDeep;
+  ctx.strokeStyle = '#FFF5CA';
   ctx.lineWidth = 4;
   ctx.stroke();
-  drawRubElHizb(ctx, lx, coinDrop, 32, t * 0.4, THEME.bgObsidian, 2.2);
-
-  ctx.font = '800 32px Cinzel';
-  ctx.fillStyle = THEME.goldBright;
+  ctx.strokeStyle = THEME.bgObsidian;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(-280, -64, 38, 0, TAU);
+  ctx.stroke();
   ctx.textAlign = 'center';
-  ctx.fillText('1 DIRHAM', lx, coinDrop - 88);
-  ctx.font = '700 24px Jakarta';
-  ctx.fillStyle = THEME.turqBright;
-  ctx.fillText('IKHLAS PENUH', lx, coinDrop - 54);
+  ctx.textBaseline = 'middle';
+  ctx.font = '900 30px Cinzel';
+  ctx.fillStyle = THEME.bgObsidian;
+  ctx.fillText('1', -280, -64);
 
-  // Right: Towering stack of 100.000 Dirham
-  const rx = 290;
-  for (let s = 0; s < 14; s++) {
-    const sy = -24 - s * 14;
-    roundRectPath(ctx, rx - 78, sy, 156, 12, 6);
-    ctx.fillStyle = s % 2 === 0 ? '#A8B6B2' : '#7C8B87';
+  ctx.font = '800 23px Jakarta';
+  ctx.fillStyle = THEME.goldBright;
+  ctx.fillText('1 DIRHAM', -280, -152);
+  ctx.font = '700 18px JetBrains';
+  ctx.fillStyle = THEME.turqBright;
+  ctx.fillText('IKHLAS PENUH (50% HARTA)', -280, -126);
+
+  // Right: Stack of 100.000 Silver Dirham
+  for (let i = 0; i < 9; i++) {
+    const sy = -20 - i * 13;
+    roundRectPath(ctx, 210, sy, 140, 10, 4);
+    ctx.fillStyle = i % 2 === 0 ? THEME.silverBright : THEME.silverMid;
     ctx.fill();
-    ctx.strokeStyle = 'rgba(0,0,0,0.4)';
-    ctx.lineWidth = 1;
-    ctx.stroke();
   }
-  ctx.font = '800 30px Cinzel';
+  ctx.font = '800 23px Jakarta';
+  ctx.fillStyle = THEME.silverBright;
+  ctx.fillText('100.000 DIRHAM', 280, -178);
+  ctx.font = '600 18px JetBrains';
   ctx.fillStyle = THEME.ivoryMuted;
-  ctx.fillText('100.000 DIRHAM', rx, -252);
-  ctx.font = '600 22px Jakarta';
-  ctx.fillStyle = THEME.slateText;
-  ctx.fillText('Sisa Harta Berlebih', rx, -218);
+  ctx.fillText('SISA HARTA BERLEBIH', 280, -152);
 
   ctx.restore();
   ctx.restore();
 }
 
-export function drawChecklistStamp(ctx, cx, cy, rows, progress) {
-  const p = clamp01(progress);
+/**
+ * x14: Ripple-of-Impact Domino Arches + Clean Editorial Comment CTA
+ */
+export function drawDominoImpactChain(ctx, cx, cy, localT) {
+  const enter = easeOutExpo(clamp01(localT / 0.65));
   ctx.save();
-  const boxW = 1080;
-  const rowH = 144;
-  const gap = 28;
-  const totalH = rows.length * rowH + (rows.length - 1) * gap;
-  const startY = cy - totalH / 2;
+  ctx.globalAlpha = enter;
 
-  rows.forEach((row, idx) => {
-    const rp = easeOutExpo(clamp01((p - idx * 0.18) / 0.5));
-    if (rp <= 0.01) return;
-    const rx = cx - boxW / 2;
-    const ry = startY + idx * (rowH + gap) + (1 - rp) * 24;
-
-    ctx.globalAlpha = rp;
-    roundRectPath(ctx, rx, ry, boxW, rowH, 26);
-    ctx.fillStyle = 'rgba(8, 28, 23, 0.88)';
-    ctx.fill();
-    ctx.strokeStyle = rgba(row.accent || THEME.goldMedina, 0.6);
-    ctx.lineWidth = 2;
-    ctx.stroke();
-
-    // Left icon circle
-    const icx = rx + 68;
-    const icy = ry + rowH / 2;
-    ctx.fillStyle = rgba(row.accent || THEME.goldMedina, 0.2);
-    ctx.beginPath();
-    ctx.arc(icx, icy, 34, 0, TAU);
-    ctx.fill();
-    ctx.strokeStyle = row.accent || THEME.goldMedina;
-    ctx.lineWidth = 2.5;
-    ctx.stroke();
-
-    ctx.font = '800 28px Cinzel';
-    ctx.fillStyle = row.accent || THEME.goldBright;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(row.iconText, icx, icy + 1);
-
-    // Text
-    ctx.textAlign = 'left';
-    ctx.font = '800 32px Jakarta';
-    ctx.fillStyle = THEME.ivory;
-    ctx.fillText(row.title, rx + 126, ry + rowH * 0.36);
-
-    ctx.font = '500 26px Jakarta';
-    ctx.fillStyle = THEME.ivoryMuted;
-    ctx.fillText(row.desc, rx + 126, ry + rowH * 0.68);
-
-    // Right badge
-    const bw = 200;
-    roundRectPath(ctx, rx + boxW - bw - 26, ry + 34, bw, 76, 18);
-    ctx.fillStyle = rgba(row.accent || THEME.goldMedina, 0.18);
-    ctx.fill();
-    ctx.strokeStyle = rgba(row.accent || THEME.goldMedina, 0.75);
-    ctx.lineWidth = 1.8;
-    ctx.stroke();
-
-    ctx.textAlign = 'center';
-    ctx.font = '800 28px Cinzel';
-    ctx.fillStyle = row.accent || THEME.goldBright;
-    ctx.fillText(row.badge, rx + boxW - bw / 2 - 26, ry + rowH / 2 + 1);
+  const boxY = cy - 230;
+  drawBevelCard(ctx, cx - 560, boxY - 215, 1120, 430, {
+    radius: 28,
+    accent: THEME.goldBright,
+    headerLabel: 'EFEK DOMINO KEBAIKAN · DARI TINDAKAN SEDERHANA',
   });
 
-  ctx.restore();
-}
+  const nodes = [
+    { x: cx - 390, r: 58, val: '1', sub: 'NIAT / SENYUM', col: THEME.turqBright },
+    { x: cx - 140, r: 74, val: '10×', sub: 'MINIMAL', col: THEME.turqBright },
+    { x: cx + 125, r: 92, val: '700×', sub: 'SEDEKAH', col: THEME.goldBright },
+    { x: cx + 395, r: 108, val: '∞', sub: 'SABAR & IKHLAS', col: THEME.goldBright },
+  ];
 
-export function drawInfinityRibbon(ctx, cx, cy, w, h, progress, t, color = THEME.goldBright) {
-  const p = clamp01(progress);
-  if (p <= 0.01) return;
-  ctx.save();
-  ctx.translate(cx, cy);
-  ctx.globalAlpha = p;
+  // Connecting forward arrow spine
+  const lineP = easeOutCubic(clamp01((localT - 0.3) / 1.5));
+  drawStrokeLine(ctx, nodes[0].x, boxY + 20, lerp(nodes[0].x, nodes[3].x, lineP), boxY + 20, rgba(THEME.goldMedina, 0.55), 5);
 
-  const steps = 160;
-  const maxStep = Math.floor(steps * p);
+  nodes.forEach((n, idx) => {
+    const np = springVal(localT - (0.3 + idx * 0.32));
+    if (np <= 0.02) return;
+    ctx.save();
+    ctx.translate(n.x, boxY + 20);
+    ctx.scale(np, np);
 
-  // Glow trail
-  ctx.strokeStyle = rgba(color, 0.35);
-  ctx.lineWidth = 22;
-  ctx.lineCap = 'round';
-  ctx.beginPath();
-  for (let i = 0; i <= maxStep; i++) {
-    const a = (i / steps) * TAU;
-    const denom = 1 + Math.sin(a) ** 2;
-    const x = ((w * 0.5) * Math.cos(a)) / denom;
-    const y = ((h * 0.65) * Math.sin(a) * Math.cos(a)) / denom;
-    if (i === 0) ctx.moveTo(x, y);
-    else ctx.lineTo(x, y);
-  }
-  ctx.stroke();
+    // Outer architectural halo ring
+    ctx.strokeStyle = rgba(n.col, 0.35);
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(0, 0, n.r + 14, 0, TAU);
+    ctx.stroke();
 
-  // Sharp metallic core
-  ctx.strokeStyle = color;
-  ctx.lineWidth = 6;
-  ctx.stroke();
+    // Main circle badge
+    ctx.fillStyle = idx >= 2 ? 'rgba(28, 24, 12, 0.96)' : 'rgba(9, 27, 23, 0.96)';
+    ctx.beginPath();
+    ctx.arc(0, 0, n.r, 0, TAU);
+    ctx.fill();
+    ctx.strokeStyle = n.col;
+    ctx.lineWidth = 3.5;
+    ctx.stroke();
 
-  // Orbiting light beads
-  for (let b = 0; b < 4; b++) {
-    const a = (t * 1.4 + (b * TAU) / 4) % TAU;
-    const denom = 1 + Math.sin(a) ** 2;
-    const bx = ((w * 0.5) * Math.cos(a)) / denom;
-    const by = ((h * 0.65) * Math.sin(a) * Math.cos(a)) / denom;
-    drawFourPointStar(ctx, bx, by, 14, 0.95, '#FFFFFF', t * 3 + b);
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = `900 ${Math.round(n.r * 0.58)}px Cinzel`;
+    ctx.fillStyle = n.col;
+    ctx.fillText(n.val, 0, 2);
+
+    ctx.font = '700 19px JetBrains';
+    ctx.fillStyle = THEME.ivoryMuted;
+    ctx.fillText(n.sub, 0, n.r + 36);
+    ctx.restore();
+  });
+
+  // Clean Comment CTA Box
+  const ctaP = easeOutExpo(clamp01((localT - 1.5) / 0.8));
+  if (ctaP > 0.02) {
+    ctx.save();
+    ctx.globalAlpha = ctaP;
+    const ctaY = cy + 295;
+    drawBevelCard(ctx, cx - 540, ctaY - 90, 1080, 180, {
+      radius: 24,
+      accent: THEME.turqBright,
+      headerLabel: 'TULIS DI KOLOM KOMENTAR',
+    });
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = '800 34px Jakarta';
+    ctx.fillStyle = THEME.ivory;
+    ctx.fillText('Kebaikan kecil apa yang paling membekas di hidupmu?', cx, ctaY + 28);
+    ctx.restore();
   }
 
   ctx.restore();
 }
 
 // ============================================================================
-// 9. TRANSISI SINEMATIK ANTAR-ADEGAN & GLOBAL COLOR GRADE
+// 8. CLEAN EDITORIAL SCENE TRANSITIONS (WIPE / CURTAIN / LIGHT SWEEP)
 // ============================================================================
 
 export function drawSceneTransitionOverlay(ctx, transitionType, u) {
-  if (u <= 0 || u >= 1) return;
-  const bell = Math.sin(u * Math.PI);
+  const t = clamp01(u);
+  const bell = Math.sin(t * Math.PI);
+  if (bell <= 0.01) return;
+
   ctx.save();
+  // Clean editorial vertical/horizontal wipe bar (zero blurry flash or particle noise)
+  const barX = lerp(-240, WIDTH + 240, easeInOutQuart(t));
+  const grad = ctx.createLinearGradient(barX - 180, 0, barX + 180, 0);
+  grad.addColorStop(0, rgba(THEME.goldBright, 0));
+  grad.addColorStop(0.5, rgba(THEME.goldBright, 0.22 * bell));
+  grad.addColorStop(1, rgba(THEME.goldBright, 0));
+  ctx.fillStyle = grad;
+  ctx.fillRect(barX - 180, 0, 360, HEIGHT);
 
-  switch (transitionType) {
-    case 'iris_gold':
-    case 'star_iris': {
-      const r = lerp(40, 1500, easeInOutCubic(u));
-      drawGirihRosette(ctx, WIDTH / 2, HEIGHT / 2, r, 12, u * 1.2, 1, {
-        strokeColor: rgba(THEME.goldBright, bell * 0.85),
-        accentColor: rgba(THEME.turqBright, bell * 0.6),
-        alpha: bell,
-        lineWidth: 4,
-        glow: true,
-      });
-      break;
-    }
-    case 'arch_wipe':
-    case 'gold_curtain': {
-      const sweepY = lerp(-200, HEIGHT + 200, easeInOutQuint(u));
-      const g = ctx.createLinearGradient(0, sweepY - 220, 0, sweepY + 220);
-      g.addColorStop(0, rgba(THEME.goldMedina, 0));
-      g.addColorStop(0.5, rgba(THEME.goldBright, bell * 0.45));
-      g.addColorStop(1, rgba(THEME.goldMedina, 0));
-      ctx.fillStyle = g;
-      ctx.fillRect(0, sweepY - 220, WIDTH, 440);
-      break;
-    }
-    case 'prism_slice':
-    case 'diagonal_sweep': {
-      const sx = lerp(-400, WIDTH + 400, easeInOutCubic(u));
-      ctx.globalCompositeOperation = 'screen';
-      const g = ctx.createLinearGradient(sx - 260, 0, sx + 260, HEIGHT * 0.35);
-      g.addColorStop(0, rgba(THEME.turqBright, 0));
-      g.addColorStop(0.5, rgba(THEME.goldBright, bell * 0.48));
-      g.addColorStop(1, rgba(THEME.turqBright, 0));
-      ctx.fillStyle = g;
-      ctx.fillRect(0, 0, WIDTH, HEIGHT);
-      break;
-    }
-    default: {
-      // Radial light flare shimmer
-      ctx.globalCompositeOperation = 'screen';
-      const rad = ctx.createRadialGradient(WIDTH / 2, HEIGHT * 0.48, 10, WIDTH / 2, HEIGHT * 0.48, 1100);
-      rad.addColorStop(0, rgba(THEME.goldBright, bell * 0.38));
-      rad.addColorStop(0.5, rgba(THEME.turqBright, bell * 0.14));
-      rad.addColorStop(1, rgba(THEME.bgObsidian, 0));
-      ctx.fillStyle = rad;
-      ctx.fillRect(0, 0, WIDTH, HEIGHT);
-      break;
-    }
-  }
-
-  ctx.restore();
-}
-
-export function drawGlobalFinishing(ctx, totalT) {
-  // Vignette is pre-baked into getStaticBackdropCanvas; subtle breathing rim accent only
-  ctx.save();
-  ctx.strokeStyle = rgba(THEME.goldMedina, 0.08 + 0.03 * Math.sin(totalT * 1.4));
-  ctx.lineWidth = 2;
-  ctx.strokeRect(18, 18, WIDTH - 36, HEIGHT - 36);
+  drawStrokeLine(ctx, barX, 0, barX, HEIGHT, rgba(THEME.goldBright, 0.35 * bell), 3);
   ctx.restore();
 }
 
 // ============================================================================
-// 10. KOMPOSITOR UTAMA PER FRAME & PEMUAT ADEGAN (x1.mjs .. x14.mjs)
+// 9. FRAME COMPOSITOR & SCENE MODULE LOADER
 // ============================================================================
 
 export async function loadSceneModules() {
@@ -2289,57 +2820,46 @@ export function createHelpers() {
     WIDTH,
     HEIGHT,
     FPS,
-    TAU,
     THEME,
     clamp,
     clamp01,
     lerp,
     invLerp,
-    remap,
     smoothstep,
-    smootherstep,
     easeOutCubic,
-    easeInOutCubic,
+    easeOutQuart,
+    easeInOutQuart,
     easeOutExpo,
-    easeInOutQuint,
     easeOutBack,
     easeOutElastic,
-    spring,
-    mulberry32,
-    noise2D,
-    fbm2D,
+    springVal,
+    stagger,
     rgba,
     lerpColor,
     createCameraState,
     applyCamera,
-    project3D,
     roundRectPath,
-    drawGlowingLine,
-    drawFourPointStar,
-    drawRubElHizb,
-    drawGirihRosette,
-    drawMihrabArch,
-    drawMashrabiyaLattice,
-    drawVolumetricRays,
-    drawStarAndDustField,
-    drawCosmicBackdrop,
-    drawTopHUD,
-    drawKineticHeadline,
+    drawStrokeLine,
+    drawRegistrationMark,
+    drawRubElHizbBadge,
+    drawBevelCard,
+    drawCalloutLeader,
+    drawArchitecturalStage,
     drawArabicPlaque,
-    drawBroadcastCaptions,
-    drawSourceFooter,
-    drawBigNumberCounter,
-    drawGlassStatCard,
-    drawMizanScale,
-    drawBotanicalSeedTree,
-    drawExponentialStaircase,
-    drawIlluminatedManuscript,
-    drawCamelSilhouette,
-    drawCaravanTwilight,
-    drawComparisonBars,
-    drawDirhamScale,
-    drawChecklistStamp,
-    drawInfinityRibbon,
+    drawHumanVsIslamicMath,
+    drawMushafAndTenBlocks,
+    drawPrecisionMizan,
+    drawHeartToScrollSystem,
+    drawInterceptGateDiagram,
+    drawExponentialAreaChart,
+    drawBotanicalCrossSection,
+    drawWheatEarLoupe,
+    drawBreakthroughAltitudeMeter,
+    drawUnboundedAbacusAndRibbon,
+    drawSyamMadinahMap,
+    drawAuctionOfferSequence,
+    drawLifespanAndDirhamInfographic,
+    drawDominoImpactChain,
   };
 }
 
@@ -2347,7 +2867,6 @@ export function renderSingleFrame(ctx, timeline, sceneRenderers, helpers, frameI
   const totalT = frameIdx / FPS;
   const scenes = timeline.scenes;
 
-  // Locate active scene for this frame
   let idx = 0;
   for (let i = 0; i < scenes.length; i++) {
     if (frameIdx >= scenes[i].startFrame && frameIdx < scenes[i].endFrame) {
@@ -2364,14 +2883,10 @@ export function renderSingleFrame(ctx, timeline, sceneRenderers, helpers, frameI
   const localT = localFrame / FPS;
   const progress = clamp01(localT / sc.durationSec);
 
-  ctx.clearRect(0, 0, WIDTH, HEIGHT);
-
-  // Scene fade-in / fade-out envelope (0.28s smooth cross-energy)
-  const inAlpha = clamp01(localT / 0.22);
-  const outAlpha = idx < scenes.length - 1 ? clamp01((sc.durationSec - localT) / 0.18) : clamp01((sc.durationSec - localT) / 0.45);
+  const inAlpha = clamp01(localT / 0.2);
+  const outAlpha = idx < scenes.length - 1 ? clamp01((sc.durationSec - localT) / 0.16) : clamp01((sc.durationSec - localT) / 0.4);
   const sceneAlpha = Math.min(inAlpha, outAlpha);
 
-  // Render scene with camera motion
   const fn = sceneRenderers[sc.id];
   if (fn) {
     fn(ctx, {
@@ -2388,14 +2903,12 @@ export function renderSingleFrame(ctx, timeline, sceneRenderers, helpers, frameI
     });
   }
 
-  // Persistent broadcast HUD, kinetic captions & source citation
   drawTopHUD(ctx, sc, localT);
   drawKineticHeadline(ctx, sc, localT);
   drawBroadcastCaptions(ctx, sc, localT);
   drawSourceFooter(ctx, sc.source, localT);
 
-  // Transition light-sweep near boundary
-  const transDur = 0.36;
+  const transDur = 0.34;
   if (idx < scenes.length - 1 && sc.durationSec - localT < transDur * 0.5) {
     const u = (transDur * 0.5 - (sc.durationSec - localT)) / transDur;
     drawSceneTransitionOverlay(ctx, sc.transition, u);
@@ -2403,13 +2916,10 @@ export function renderSingleFrame(ctx, timeline, sceneRenderers, helpers, frameI
     const u = 0.5 + localT / transDur;
     drawSceneTransitionOverlay(ctx, scenes[idx - 1].transition, u);
   }
-
-  // Global color grade & grain
-  drawGlobalFinishing(ctx, totalT);
 }
 
 // ============================================================================
-// 11. MULTI-WORKER RENDER PIPELINE & CLI RUNNER
+// 10. MULTI-WORKER RENDER PIPELINE WITH BACKPRESSURE
 // ============================================================================
 
 async function runWorker() {
@@ -2422,9 +2932,7 @@ async function runWorker() {
   const ctx = canvas.getContext('2d');
 
   parentPort.on('message', (msg) => {
-    if (msg.stop) {
-      process.exit(0);
-    }
+    if (msg.stop) process.exit(0);
     const f = msg.frame;
     renderSingleFrame(ctx, timeline, sceneRenderers, helpers, f);
     const img = ctx.getImageData(0, 0, WIDTH, HEIGHT);
@@ -2446,7 +2954,7 @@ async function runPreview(timeline) {
 
   for (let i = 0; i < timeline.scenes.length; i++) {
     const sc = timeline.scenes[i];
-    const targetFrame = sc.startFrame + Math.round(sc.durationFrames * 0.62);
+    const targetFrame = sc.startFrame + Math.round(sc.durationFrames * 0.65);
     renderSingleFrame(ctx, timeline, sceneRenderers, helpers, targetFrame);
     const outPath = join(outDir, `${sc.id}.png`);
     writeFileSync(outPath, canvas.toBufferSync('png'));
@@ -2544,8 +3052,7 @@ async function runFullRender(timeline, maxFrames = null) {
     }
     if (nextDispatchFrame >= totalFrames) {
       while (idleWorkers.length > 0) {
-        const wk = idleWorkers.shift();
-        wk.postMessage({ stop: true });
+        idleWorkers.shift().postMessage({ stop: true });
       }
     }
   };
@@ -2586,11 +3093,8 @@ async function runFullRender(timeline, maxFrames = null) {
 
     for (let w = 0; w < workerCount; w++) {
       const wk = new Worker(new URL(import.meta.url), {
-        workerData: {
-          timelinePath: VIDEO_CONFIG.timelineFile,
-        },
+        workerData: { timelinePath: VIDEO_CONFIG.timelineFile },
       });
-
       wk.on('message', (msg) => {
         if (msg.ready) {
           idleWorkers.push(wk);
@@ -2610,986 +3114,62 @@ async function runFullRender(timeline, maxFrames = null) {
 }
 
 // ============================================================================
-// 12. MODUL KALIGRAFI & ORNAMEN TAMBAHAN UNTUK ADEGAN SPESIFIK
+// 11. ADDITIONAL STUDIO EXPLANATORY HELPERS (MODULAR GRAPHICS)
 // ============================================================================
 
-export function drawHilalCrescent(ctx, cx, cy, radius, progress, t, glowColor = THEME.goldBright) {
-  const p = easeOutExpo(clamp01(progress));
-  if (p <= 0.01) return;
-  ctx.save();
-  ctx.translate(cx, cy);
-  ctx.rotate(-0.35 + Math.sin(t * 0.7) * 0.04);
-  ctx.scale(p, p);
-
-  const aura = ctx.createRadialGradient(0, 0, radius * 0.3, 0, 0, radius * 2.1);
-  aura.addColorStop(0, rgba(glowColor, 0.38));
-  aura.addColorStop(0.5, rgba(THEME.turqBright, 0.12));
-  aura.addColorStop(1, rgba(THEME.bgObsidian, 0));
-  ctx.fillStyle = aura;
-  ctx.beginPath();
-  ctx.arc(0, 0, radius * 2.1, 0, TAU);
-  ctx.fill();
-
-  // Crescent via geometric intersection arc
-  ctx.fillStyle = glowColor;
-  ctx.shadowColor = rgba(glowColor, 0.65);
-  ctx.shadowBlur = 24;
-  ctx.beginPath();
-  ctx.arc(0, 0, radius, 0.55, TAU - 0.55, false);
-  ctx.arc(radius * 0.36, 0, radius * 0.82, TAU - 0.72, 0.72, true);
-  ctx.closePath();
-  ctx.fill();
-  ctx.shadowBlur = 0;
-
-  // Companion star inside crescent horn
-  drawFourPointStar(ctx, radius * 0.65, -radius * 0.15, radius * 0.24, 0.95, '#FFFFFF', t * 0.8);
-  ctx.restore();
-}
-
-export function drawOrbitalEquationRing(ctx, cx, cy, radius, labels, progress, t) {
-  const p = clamp01(progress);
-  if (p <= 0.01) return;
-  ctx.save();
-  ctx.translate(cx, cy);
-  ctx.globalAlpha = p;
-
-  ctx.strokeStyle = rgba(THEME.goldMedina, 0.45);
-  ctx.lineWidth = 2;
-  ctx.setLineDash([12, 10]);
-  ctx.lineDashOffset = -t * 28;
-  ctx.beginPath();
-  ctx.arc(0, 0, radius, 0, TAU);
-  ctx.stroke();
-  ctx.setLineDash([]);
-
-  labels.forEach((lbl, idx) => {
-    const a = t * 0.35 + (idx * TAU) / labels.length - Math.PI / 2;
-    const lx = Math.cos(a) * radius;
-    const ly = Math.sin(a) * radius;
-
-    roundRectPath(ctx, lx - 72, ly - 32, 144, 64, 32);
-    ctx.fillStyle = 'rgba(7, 26, 22, 0.9)';
-    ctx.fill();
-    ctx.strokeStyle = rgba(THEME.goldBright, 0.75);
-    ctx.lineWidth = 2;
-    ctx.stroke();
-
-    ctx.font = '800 28px Cinzel';
-    ctx.fillStyle = THEME.goldBright;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(lbl, lx, ly + 1);
-  });
-
-  ctx.restore();
-}
-
-export function drawPulseHeartShield(ctx, cx, cy, size, progress, t, mode = 'good') {
-  const p = easeOutExpo(clamp01(progress));
-  if (p <= 0.01) return;
-
-  const col = mode === 'shield' ? THEME.turqBright : THEME.goldBright;
-  ctx.save();
-  ctx.translate(cx, cy);
-  ctx.scale(p, p);
-
-  // Expanding concentric ripples
-  for (let r = 0; r < 3; r++) {
-    const phase = (t * 0.7 + r * 0.33) % 1;
-    const rr = size * (0.7 + phase * 1.15);
-    ctx.strokeStyle = rgba(col, (1 - phase) * 0.45);
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.arc(0, 0, rr, 0, TAU);
-    ctx.stroke();
-  }
-
-  // Octagonal shield frame
-  drawRubElHizb(ctx, 0, 0, size * 0.95, t * 0.18, col, 3.5, rgba(col, 0.14));
-
-  // Center luminous core
-  const cg = ctx.createRadialGradient(0, 0, 4, 0, 0, size * 0.55);
-  cg.addColorStop(0, '#FFFFFF');
-  cg.addColorStop(0.45, col);
-  cg.addColorStop(1, rgba(col, 0));
-  ctx.fillStyle = cg;
-  ctx.beginPath();
-  ctx.arc(0, 0, size * 0.55, 0, TAU);
-  ctx.fill();
-
-  ctx.restore();
-}
-
-export function drawSplitArenaCards(ctx, cx, cy, leftCard, rightCard, progress, t) {
-  const p = easeOutExpo(clamp01(progress));
-  if (p <= 0.01) return;
-  const w = 540;
-  const h = 420;
-  const gap = 44;
-
-  // Left card (worldly offer)
-  drawGlassStatCard(
-    ctx,
-    cx - w - gap / 2,
-    cy - h / 2,
-    w,
-    h,
-    leftCard.title,
-    leftCard.value,
-    leftCard.sub,
-    leftCard.accent || THEME.crimsonBright,
-    p,
-  );
-
-  // Optional diagonal strike-through on left card
-  if (leftCard.crossed && p > 0.55) {
-    const cp = easeOutCubic(clamp01((p - 0.55) / 0.35));
-    const x0 = cx - w - gap / 2 + 44;
-    const y0 = cy - h / 2 + 65;
-    const x1 = lerp(x0, x0 + w - 88, cp);
-    const y1 = lerp(y0, y0 + h - 130, cp);
-    drawGlowingLine(ctx, x0, y0, x1, y1, THEME.crimsonBright, 7, 16);
-  }
-
-  // Right card (Allah's promise)
-  drawGlassStatCard(
-    ctx,
-    cx + gap / 2,
-    cy - h / 2,
-    w,
-    h,
-    rightCard.title,
-    rightCard.value,
-    rightCard.sub,
-    rightCard.accent || THEME.goldBright,
-    clamp01((p - 0.15) / 0.85),
-  );
-
-  // Floating VS medallion between cards
-  ctx.save();
-  ctx.globalAlpha = p;
-  drawRubElHizb(ctx, cx, cy, 48, t * 0.4, THEME.goldBright, 2.5, 'rgba(6, 22, 18, 0.95)');
-  ctx.font = '800 28px Cinzel';
-  ctx.fillStyle = THEME.goldBright;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText('VS', cx, cy + 1);
-  ctx.restore();
-}
-
-export function drawLailatulQadarArc(ctx, cx, cy, w, progress, t) {
-  const p = easeOutExpo(clamp01(progress));
-  if (p <= 0.01) return;
-  ctx.save();
-  ctx.globalAlpha = p;
-  const x0 = cx - w / 2;
-  const x1 = cx + w / 2;
-
-  ctx.strokeStyle = THEME.goldBright;
-  ctx.lineWidth = 4;
-  ctx.setLineDash([12, 8]);
-  ctx.lineDashOffset = -t * 36;
-  ctx.beginPath();
-  ctx.moveTo(x0, cy);
-  ctx.quadraticCurveTo(cx, cy - 170 * p, x1, cy);
-  ctx.stroke();
-  ctx.setLineDash([]);
-
-  roundRectPath(ctx, cx - 260, cy - 135, 520, 74, 37);
-  ctx.fillStyle = 'rgba(7, 25, 21, 0.92)';
-  ctx.fill();
-  ctx.strokeStyle = THEME.goldMedina;
-  ctx.lineWidth = 2;
-  ctx.stroke();
-
-  ctx.font = '700 26px Jakarta';
-  ctx.fillStyle = THEME.goldBright;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText('LAILATUL QADAR > 1.000 BULAN (83+ TAHUN)', cx, cy - 97);
-  ctx.restore();
-}
-
-export function drawMandalaSynthesis(ctx, cx, cy, radius, labels, progress, t) {
-  const p = easeOutExpo(clamp01(progress));
-  if (p <= 0.01) return;
-
-  ctx.save();
-  drawGirihRosette(ctx, cx, cy, radius * p, 12, t * 0.14, p, {
-    strokeColor: THEME.goldMedina,
-    accentColor: THEME.turqBright,
-    alpha: 0.9,
-    lineWidth: 2.6,
-    glow: true,
-    innerDetail: true,
-  });
-
-  labels.forEach((lbl, i) => {
-    const a = t * 0.18 + (i * TAU) / labels.length - Math.PI / 2;
-    const rx = cx + Math.cos(a) * radius * 0.96;
-    const ry = cy + Math.sin(a) * radius * 0.96;
-
-    const sp = easeOutBack(clamp01((p - i * 0.08) / 0.6));
-    ctx.save();
-    ctx.translate(rx, ry);
-    ctx.scale(sp, sp);
-    roundRectPath(ctx, -110, -34, 220, 68, 34);
-    ctx.fillStyle = 'rgba(5, 19, 16, 0.92)';
-    ctx.fill();
-    ctx.strokeStyle = THEME.goldBright;
-    ctx.lineWidth = 2;
-    ctx.stroke();
-
-    ctx.font = '800 24px Jakarta';
-    ctx.fillStyle = THEME.goldBright;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(lbl, 0, 1);
-    ctx.restore();
-  });
-
-  drawBigNumberCounter(ctx, cx, cy, '700×+', 'SEDEKAH · NIAT · SABAR', p, {
-    fontSize: 132,
-    echoTrails: false,
-  });
-  ctx.restore();
-}
-
-export function drawCommentCTA(ctx, cx, cy, promptText, progress, t) {
-  const p = easeOutExpo(clamp01(progress));
-  if (p <= 0.01) return;
-  ctx.save();
-  ctx.globalAlpha = p;
-  const pulse = 1 + 0.018 * Math.sin(t * 3.5);
-  ctx.translate(cx, cy);
-  ctx.scale(pulse, pulse);
-
-  const w = 1040;
-  const h = 136;
-  roundRectPath(ctx, -w / 2, -h / 2, w, h, 32);
-  const g = ctx.createLinearGradient(-w / 2, -h / 2, w / 2, h / 2);
-  g.addColorStop(0, 'rgba(18, 52, 43, 0.92)');
-  g.addColorStop(1, 'rgba(9, 28, 24, 0.95)');
-  ctx.fillStyle = g;
-  ctx.shadowColor = rgba(THEME.goldMedina, 0.35);
-  ctx.shadowBlur = 24;
-  ctx.fill();
-  ctx.shadowBlur = 0;
-  ctx.strokeStyle = THEME.goldBright;
-  ctx.lineWidth = 2.4;
-  ctx.stroke();
-
-  ctx.font = '700 24px JetBrains';
-  ctx.fillStyle = THEME.turqBright;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText('TULIS DI KOMENTAR', 0, -28);
-
-  ctx.font = '800 33px Jakarta';
-  ctx.fillStyle = THEME.ivory;
-  ctx.fillText(promptText, 0, 22, w - 64);
-
-  ctx.restore();
-}
-
-// ============================================================================
-// 13. PEMBANTU GEOMETRI MIKRO & PEMANGGILAN CLI
-// ============================================================================
-
-export function drawFloatingVerseTag(ctx, cx, cy, tagText, progress) {
-  const p = easeOutCubic(clamp01(progress));
-  if (p <= 0.01) return;
-  ctx.save();
-  ctx.globalAlpha = p;
-  ctx.font = '700 26px JetBrains';
-  const tw = ctx.measureText(tagText).width + 52;
-  roundRectPath(ctx, cx - tw / 2, cy - 26, tw, 52, 26);
-  ctx.fillStyle = rgba(THEME.goldMedina, 0.16);
-  ctx.fill();
-  ctx.strokeStyle = rgba(THEME.goldBright, 0.65);
-  ctx.lineWidth = 1.8;
-  ctx.stroke();
-
-  ctx.fillStyle = THEME.goldBright;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(tagText, cx, cy + 1);
-  ctx.restore();
-}
-
-export function drawRadialProgressHalo(ctx, cx, cy, radius, ratio, color, lineWidth = 10) {
-  ctx.save();
-  ctx.strokeStyle = rgba(color, 0.18);
-  ctx.lineWidth = lineWidth;
-  ctx.beginPath();
-  ctx.arc(cx, cy, radius, 0, TAU);
-  ctx.stroke();
-
-  ctx.strokeStyle = color;
-  ctx.lineCap = 'round';
-  ctx.shadowColor = rgba(color, 0.55);
-  ctx.shadowBlur = 16;
-  ctx.beginPath();
-  ctx.arc(cx, cy, radius, -Math.PI / 2, -Math.PI / 2 + TAU * clamp01(ratio));
-  ctx.stroke();
-  ctx.restore();
-}
-
-export function drawSparkBurst(ctx, cx, cy, seed, count, maxR, progress, color = THEME.goldBright) {
-  const p = easeOutExpo(clamp01(progress));
-  if (p <= 0.01 || p >= 0.99) return;
-  const rnd = mulberry32(seed);
-  ctx.save();
-  const fade = Math.sin(p * Math.PI);
-  for (let i = 0; i < count; i++) {
-    const a = rnd() * TAU;
-    const r = (0.25 + 0.75 * rnd()) * maxR * p;
-    const x = cx + Math.cos(a) * r;
-    const y = cy + Math.sin(a) * r;
-    const sz = 2.5 + rnd() * 4.5;
-    ctx.fillStyle = rgba(color, fade * 0.85);
-    ctx.beginPath();
-    ctx.arc(x, y, sz * (1 - p * 0.4), 0, TAU);
-    ctx.fill();
-  }
-  ctx.restore();
-}
-
-export function drawCornerFiligree(ctx, x, y, size, corner = 'tl', color = THEME.goldMedina, alpha = 0.5) {
-  ctx.save();
-  ctx.translate(x, y);
-  const sx = corner.includes('r') ? -1 : 1;
-  const sy = corner.includes('b') ? -1 : 1;
-  ctx.scale(sx, sy);
-  ctx.globalAlpha = alpha;
-  ctx.strokeStyle = color;
-  ctx.lineWidth = 2.2;
-  ctx.beginPath();
-  ctx.moveTo(0, size);
-  ctx.lineTo(0, 0);
-  ctx.lineTo(size, 0);
-  ctx.stroke();
-
-  ctx.beginPath();
-  ctx.arc(size * 0.25, size * 0.25, size * 0.14, 0, TAU);
-  ctx.stroke();
-  ctx.restore();
-}
-
-export function drawFramedCalloutPill(ctx, cx, cy, label, value, color = THEME.turqBright, progress = 1) {
-  const p = easeOutBack(clamp01(progress), 1.25);
-  if (p <= 0.01) return;
-  ctx.save();
-  ctx.translate(cx, cy);
-  ctx.scale(p, p);
-  const w = 480;
-  const h = 112;
-  roundRectPath(ctx, -w / 2, -h / 2, w, h, 24);
-  ctx.fillStyle = 'rgba(6, 23, 19, 0.9)';
-  ctx.fill();
-  ctx.strokeStyle = rgba(color, 0.7);
-  ctx.lineWidth = 2;
-  ctx.stroke();
-
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.font = '700 22px JetBrains';
-  ctx.fillStyle = color;
-  ctx.fillText(label, 0, -22);
-  ctx.font = '800 34px Jakarta';
-  ctx.fillStyle = THEME.ivory;
-  ctx.fillText(value, 0, 20);
-  ctx.restore();
-}
-
-export function drawVerticalDividerBeam(ctx, cx, y0, y1, color = THEME.goldMedina, alpha = 0.45) {
-  ctx.save();
-  const g = ctx.createLinearGradient(cx, y0, cx, y1);
-  g.addColorStop(0, rgba(color, 0));
-  g.addColorStop(0.5, rgba(color, alpha));
-  g.addColorStop(1, rgba(color, 0));
-  ctx.strokeStyle = g;
-  ctx.lineWidth = 2.5;
-  ctx.beginPath();
-  ctx.moveTo(cx, y0);
-  ctx.lineTo(cx, y1);
-  ctx.stroke();
-  ctx.restore();
-}
-
-export function drawAnimatedArrow(ctx, x0, y0, x1, y1, progress, color = THEME.goldBright, width = 4) {
+export function drawStepFlowPill(ctx, cx, cy, num, title, desc, accent, progress) {
   const p = easeOutExpo(clamp01(progress));
   if (p <= 0.02) return;
-  const cx = lerp(x0, x1, p);
-  const cy = lerp(y0, y1, p);
-  ctx.save();
-  ctx.strokeStyle = color;
-  ctx.lineWidth = width;
-  ctx.lineCap = 'round';
-  ctx.shadowColor = rgba(color, 0.5);
-  ctx.shadowBlur = 12;
-  ctx.beginPath();
-  ctx.moveTo(x0, y0);
-  ctx.lineTo(cx, cy);
-  ctx.stroke();
-
-  if (p > 0.25) {
-    const angle = Math.atan2(y1 - y0, x1 - x0);
-    const headLen = 18;
-    ctx.beginPath();
-    ctx.moveTo(cx, cy);
-    ctx.lineTo(cx - headLen * Math.cos(angle - 0.45), cy - headLen * Math.sin(angle - 0.45));
-    ctx.moveTo(cx, cy);
-    ctx.lineTo(cx - headLen * Math.cos(angle + 0.45), cy - headLen * Math.sin(angle + 0.45));
-    ctx.stroke();
-  }
-  ctx.restore();
-}
-
-export function drawTimelineTicks(ctx, cx, cy, w, labels, activeIndex, progress) {
-  const p = easeOutExpo(clamp01(progress));
-  if (p <= 0.01) return;
   ctx.save();
   ctx.globalAlpha = p;
-  const x0 = cx - w / 2;
-  const x1 = cx + w / 2;
-  drawGlowingLine(ctx, x0, cy, lerp(x0, x1, p), cy, rgba(THEME.goldMedina, 0.6), 3, 8);
-
-  labels.forEach((lbl, idx) => {
-    const tx = lerp(x0, x1, idx / Math.max(1, labels.length - 1));
-    const active = idx <= activeIndex;
-    ctx.fillStyle = active ? THEME.goldBright : THEME.bgEmeraldMid;
-    ctx.beginPath();
-    ctx.arc(tx, cy, active ? 13 : 9, 0, TAU);
-    ctx.fill();
-    ctx.strokeStyle = THEME.goldMedina;
-    ctx.lineWidth = 2;
-    ctx.stroke();
-
-    ctx.font = active ? '800 24px JetBrains' : '600 22px JetBrains';
-    ctx.fillStyle = active ? THEME.goldBright : THEME.slateText;
-    ctx.textAlign = 'center';
-    ctx.fillText(lbl, tx, cy + 40);
-  });
-  ctx.restore();
-}
-
-export function drawDataBadgeRow(ctx, cx, cy, badges, progress) {
-  const p = easeOutExpo(clamp01(progress));
-  if (p <= 0.01) return;
-  const w = 330;
-  const gap = 30;
-  const totalW = badges.length * w + (badges.length - 1) * gap;
-  const sx = cx - totalW / 2;
-
-  badges.forEach((b, i) => {
-    const bp = clamp01((p - i * 0.12) / 0.6);
-    drawGlassStatCard(ctx, sx + i * (w + gap), cy - 75, w, 150, b.tag, b.val, b.sub, b.color || THEME.goldMedina, bp);
-  });
-}
-
-export function drawCrescentSkylineAura(ctx, cx, cy, progress, t) {
-  const p = clamp01(progress);
-  if (p <= 0.01) return;
-  ctx.save();
-  ctx.globalAlpha = p;
-  for (let i = 0; i < 4; i++) {
-    const r = 140 + i * 95 + Math.sin(t * 1.1 + i) * 8;
-    ctx.strokeStyle = rgba(i % 2 === 0 ? THEME.goldMedina : THEME.turqBright, 0.24 - i * 0.04);
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.arc(cx, cy, r, Math.PI * 0.85, Math.PI * 2.15);
-    ctx.stroke();
-  }
-  ctx.restore();
-}
-
-export function drawMetricPill(ctx, cx, cy, title, val, accent, progress) {
-  const p = easeOutBack(clamp01(progress), 1.2);
-  if (p <= 0.01) return;
-  ctx.save();
-  ctx.translate(cx, cy);
-  ctx.scale(p, p);
-  ctx.font = '800 34px Jakarta';
-  const w = Math.max(780, Math.min(1240, ctx.measureText(val).width + 120));
-  const h = 112;
-  roundRectPath(ctx, -w / 2, -h / 2, w, h, 56);
-  ctx.fillStyle = 'rgba(7, 25, 21, 0.94)';
-  ctx.fill();
-  ctx.strokeStyle = rgba(accent, 0.75);
-  ctx.lineWidth = 2.4;
-  ctx.stroke();
-
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.font = '700 23px JetBrains';
+  const dy = (1 - p) * 20;
+  drawBevelCard(ctx, cx - 520, cy - 58 + dy, 1040, 116, { radius: 20, accent });
+  roundRectPath(ctx, cx - 495, cy - 34 + dy, 68, 68, 16);
   ctx.fillStyle = accent;
-  ctx.fillText(title, 0, -22);
-  ctx.font = '800 34px Jakarta';
-  ctx.fillStyle = THEME.ivory;
-  ctx.fillText(val, 0, 20);
-  ctx.restore();
-}
-
-export function drawShatterParticles(ctx, cx, cy, progress, t, color = THEME.goldBright) {
-  const p = clamp01(progress);
-  if (p <= 0.01) return;
-  const rnd = mulberry32(4049);
-  ctx.save();
-  for (let i = 0; i < 36; i++) {
-    const a = rnd() * TAU;
-    const dist = (40 + rnd() * 320) * easeOutExpo(p);
-    const px = cx + Math.cos(a) * dist;
-    const py = cy + Math.sin(a) * dist - p * 90;
-    const sz = 6 + rnd() * 14;
-    ctx.save();
-    ctx.translate(px, py);
-    ctx.rotate(t * 2 + i);
-    ctx.globalAlpha = (1 - p * 0.65) * 0.85;
-    ctx.fillStyle = i % 3 === 0 ? THEME.turqBright : color;
-    ctx.beginPath();
-    ctx.moveTo(0, -sz);
-    ctx.lineTo(sz * 0.7, 0);
-    ctx.lineTo(0, sz);
-    ctx.lineTo(-sz * 0.7, 0);
-    ctx.closePath();
-    ctx.fill();
-    ctx.restore();
-  }
-  ctx.restore();
-}
-
-export function drawGoldenRippleRings(ctx, cx, cy, t, color = THEME.goldMedina, maxR = 460) {
-  ctx.save();
-  for (let i = 0; i < 4; i++) {
-    const u = (t * 0.45 + i * 0.25) % 1;
-    const r = lerp(70, maxR, easeOutCubic(u));
-    const a = (1 - u) * 0.42;
-    ctx.strokeStyle = rgba(color, a);
-    ctx.lineWidth = 2.5;
-    ctx.beginPath();
-    ctx.arc(cx, cy, r, 0, TAU);
-    ctx.stroke();
-  }
-  ctx.restore();
-}
-
-export function drawStarConstellation(ctx, cx, cy, spreadW, spreadH, progress, t) {
-  const p = clamp01(progress);
-  if (p <= 0.01) return;
-  const pts = [
-    [-0.42, -0.22],
-    [-0.18, -0.35],
-    [0.05, -0.14],
-    [0.28, -0.32],
-    [0.44, -0.08],
-    [0.18, 0.2],
-    [-0.14, 0.24],
-    [-0.36, 0.08],
-  ].map(([nx, ny], i) => ({
-    x: cx + nx * spreadW + Math.sin(t + i) * 6,
-    y: cy + ny * spreadH + Math.cos(t * 0.8 + i) * 6,
-  }));
-
-  ctx.save();
-  ctx.globalAlpha = p;
-  ctx.strokeStyle = rgba(THEME.turqBright, 0.35);
-  ctx.lineWidth = 1.6;
-  for (let i = 0; i < pts.length; i++) {
-    const a = pts[i];
-    const b = pts[(i + 1) % pts.length];
-    ctx.beginPath();
-    ctx.moveTo(a.x, a.y);
-    ctx.lineTo(b.x, b.y);
-    ctx.stroke();
-  }
-  pts.forEach((pt, i) => {
-    drawFourPointStar(ctx, pt.x, pt.y, 12 + (i % 3) * 4, 0.9, THEME.goldBright, t * 0.6 + i);
-  });
-  ctx.restore();
-}
-
-export function drawStackedCoinsTower(ctx, cx, baseY, count, coinW, progress, color = THEME.goldMedina) {
-  const p = easeOutExpo(clamp01(progress));
-  const visible = Math.floor(count * p);
-  ctx.save();
-  for (let i = 0; i < visible; i++) {
-    const cy = baseY - i * 16;
-    roundRectPath(ctx, cx - coinW / 2, cy - 12, coinW, 13, 6);
-    const g = ctx.createLinearGradient(cx - coinW / 2, cy, cx + coinW / 2, cy);
-    g.addColorStop(0, THEME.goldDeep);
-    g.addColorStop(0.5, color);
-    g.addColorStop(1, THEME.goldDeep);
-    ctx.fillStyle = g;
-    ctx.fill();
-    ctx.strokeStyle = 'rgba(0,0,0,0.45)';
-    ctx.lineWidth = 1.2;
-    ctx.stroke();
-  }
-  ctx.restore();
-}
-
-export function drawLightEnvelopeBeam(ctx, x0, y0, x1, y1, width, progress, color = THEME.goldBright) {
-  const p = clamp01(progress);
-  if (p <= 0.01) return;
-  const ex = lerp(x0, x1, easeOutExpo(p));
-  const ey = lerp(y0, y1, easeOutExpo(p));
-  ctx.save();
-  const g = ctx.createLinearGradient(x0, y0, ex, ey);
-  g.addColorStop(0, rgba(color, 0.1));
-  g.addColorStop(0.65, rgba(color, 0.65));
-  g.addColorStop(1, '#FFFFFF');
-  ctx.strokeStyle = g;
-  ctx.lineWidth = width;
-  ctx.lineCap = 'round';
-  ctx.shadowColor = color;
-  ctx.shadowBlur = 22;
-  ctx.beginPath();
-  ctx.moveTo(x0, y0);
-  ctx.lineTo(ex, ey);
-  ctx.stroke();
-
-  drawFourPointStar(ctx, ex, ey, width * 2.4, 0.95, '#FFFFFF');
-  ctx.restore();
-}
-
-export function drawHaloArchText(ctx, cx, cy, topText, bottomText, progress, color = THEME.goldBright) {
-  const p = easeOutExpo(clamp01(progress));
-  if (p <= 0.01) return;
-  ctx.save();
-  ctx.globalAlpha = p;
+  ctx.fill();
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.font = '800 44px Jakarta';
-  ctx.fillStyle = color;
-  ctx.fillText(topText, cx, cy - 28);
-  ctx.font = '600 28px Jakarta';
-  ctx.fillStyle = THEME.ivoryMuted;
-  ctx.fillText(bottomText, cx, cy + 26);
-  ctx.restore();
-}
-
-export function drawRotatingAstrolabe(ctx, cx, cy, radius, progress, t) {
-  const p = easeOutExpo(clamp01(progress));
-  if (p <= 0.01) return;
-  ctx.save();
-  ctx.translate(cx, cy);
-  ctx.scale(p, p);
-  ctx.globalAlpha = 0.85 * p;
-
-  // Outer degree bezel
-  ctx.strokeStyle = rgba(THEME.goldMedina, 0.7);
-  ctx.lineWidth = 3;
-  ctx.beginPath();
-  ctx.arc(0, 0, radius, 0, TAU);
-  ctx.stroke();
-
-  for (let d = 0; d < 72; d++) {
-    const a = (d * TAU) / 72;
-    const len = d % 6 === 0 ? 16 : 8;
-    ctx.strokeStyle = d % 6 === 0 ? THEME.goldBright : rgba(THEME.goldMedina, 0.45);
-    ctx.lineWidth = d % 6 === 0 ? 2.4 : 1.2;
-    ctx.beginPath();
-    ctx.moveTo(Math.cos(a) * (radius - len), Math.sin(a) * (radius - len));
-    ctx.lineTo(Math.cos(a) * radius, Math.sin(a) * radius);
-    ctx.stroke();
-  }
-
-  // Rotating rete ring
-  ctx.save();
-  ctx.rotate(t * 0.25);
-  ctx.strokeStyle = rgba(THEME.turqBright, 0.65);
-  ctx.lineWidth = 2.2;
-  ctx.beginPath();
-  ctx.arc(0, -radius * 0.16, radius * 0.62, 0, TAU);
-  ctx.stroke();
-  drawRubElHizb(ctx, 0, 0, radius * 0.48, -t * 0.4, THEME.goldBright, 2);
-  ctx.restore();
-
-  // Alidade pointer bar
-  ctx.save();
-  ctx.rotate(-t * 0.18);
-  drawGlowingLine(ctx, -radius * 0.92, 0, radius * 0.92, 0, THEME.goldMedina, 2.5, 10);
-  ctx.restore();
-
-  ctx.restore();
-}
-
-export function drawGlowingDividerPill(ctx, cx, cy, text, accent = THEME.turqBright, progress = 1) {
-  const p = easeOutCubic(clamp01(progress));
-  if (p <= 0.01) return;
-  ctx.save();
-  ctx.globalAlpha = p;
-  ctx.font = '700 24px JetBrains';
-  const w = ctx.measureText(text).width + 60;
-  roundRectPath(ctx, cx - w / 2, cy - 25, w, 50, 25);
-  ctx.fillStyle = 'rgba(5, 19, 16, 0.92)';
-  ctx.fill();
-  ctx.strokeStyle = rgba(accent, 0.72);
-  ctx.lineWidth = 1.8;
-  ctx.stroke();
-
-  ctx.fillStyle = accent;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(text, cx, cy + 1);
-  ctx.restore();
-}
-
-export function drawDualMetricSplit(ctx, cx, cy, left, right, progress) {
-  const p = easeOutExpo(clamp01(progress));
-  if (p <= 0.01) return;
-  const w = 520;
-  const h = 210;
-  const gap = 46;
-  drawGlassStatCard(ctx, cx - w - gap / 2, cy - h / 2, w, h, left.tag, left.val, left.sub, left.color, p);
-  drawGlassStatCard(ctx, cx + gap / 2, cy - h / 2, w, h, right.tag, right.val, right.sub, right.color, clamp01((p - 0.12) / 0.88));
-}
-
-export function drawKineticBadgeCluster(ctx, cx, cy, items, progress, t) {
-  const p = clamp01(progress);
-  if (p <= 0.01) return;
-  items.forEach((item, i) => {
-    const ip = easeOutBack(clamp01((p - i * 0.12) / 0.55));
-    if (ip <= 0.01) return;
-    const x = cx + item.dx;
-    const y = cy + item.dy + Math.sin(t * 1.6 + i) * 6;
-    ctx.save();
-    ctx.translate(x, y);
-    ctx.scale(ip, ip);
-    roundRectPath(ctx, -185, -48, 370, 96, 24);
-    ctx.fillStyle = 'rgba(7, 25, 21, 0.9)';
-    ctx.fill();
-    ctx.strokeStyle = rgba(item.color || THEME.goldMedina, 0.65);
-    ctx.lineWidth = 2;
-    ctx.stroke();
-
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.font = '800 30px Cinzel';
-    ctx.fillStyle = item.color || THEME.goldBright;
-    ctx.fillText(item.val, 0, -14);
-    ctx.font = '600 22px Jakarta';
-    ctx.fillStyle = THEME.ivoryMuted;
-    ctx.fillText(item.label, 0, 22);
-    ctx.restore();
-  });
-}
-
-export function drawScrollBanner(ctx, cx, cy, w, h, title, body, progress) {
-  const p = easeOutExpo(clamp01(progress));
-  if (p <= 0.01) return;
-  ctx.save();
-  ctx.globalAlpha = p;
-  const cw = w * p;
-  roundRectPath(ctx, cx - cw / 2, cy - h / 2, cw, h, 26);
-  ctx.fillStyle = 'rgba(10, 32, 26, 0.88)';
-  ctx.fill();
-  ctx.strokeStyle = THEME.goldMedina;
-  ctx.lineWidth = 2;
-  ctx.stroke();
-
-  if (p > 0.45) {
-    ctx.globalAlpha = clamp01((p - 0.45) / 0.55);
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.font = '700 25px JetBrains';
-    ctx.fillStyle = THEME.turqBright;
-    ctx.fillText(title, cx, cy - 24);
-    ctx.font = '700 32px Jakarta';
-    ctx.fillStyle = THEME.ivory;
-    ctx.fillText(body, cx, cy + 20, w - 60);
-  }
-  ctx.restore();
-}
-
-export function drawOrbitalParticleStream(ctx, cx, cy, radiusX, radiusY, count, t, color = THEME.goldBright) {
-  ctx.save();
-  for (let i = 0; i < count; i++) {
-    const a = t * 0.9 + (i * TAU) / count;
-    const x = cx + Math.cos(a) * radiusX;
-    const y = cy + Math.sin(a) * radiusY;
-    const alpha = 0.35 + 0.65 * (0.5 + 0.5 * Math.sin(a));
-    ctx.fillStyle = rgba(color, alpha);
-    ctx.beginPath();
-    ctx.arc(x, y, 3.2 + (i % 3), 0, TAU);
-    ctx.fill();
-  }
-  ctx.restore();
-}
-
-export function drawMultiRingHalo(ctx, cx, cy, baseR, rings, progress, t) {
-  const p = easeOutExpo(clamp01(progress));
-  if (p <= 0.01) return;
-  ctx.save();
-  ctx.translate(cx, cy);
-  for (let i = 0; i < rings; i++) {
-    const r = (baseR + i * 54) * p;
-    ctx.save();
-    ctx.rotate(t * (i % 2 === 0 ? 0.25 : -0.2) + i);
-    ctx.strokeStyle = rgba(i % 2 === 0 ? THEME.goldMedina : THEME.turqBright, 0.35 - i * 0.05);
-    ctx.lineWidth = 2;
-    ctx.setLineDash([28, 16]);
-    ctx.beginPath();
-    ctx.arc(0, 0, r, 0, TAU);
-    ctx.stroke();
-    ctx.restore();
-  }
-  ctx.restore();
-}
-
-export function drawVerticalBeamPillar(ctx, cx, topY, botY, w, progress, color = THEME.goldBright, label = '') {
-  const p = easeOutExpo(clamp01(progress));
-  if (p <= 0.01) return;
-  ctx.save();
-  const h = (botY - topY) * p;
-  const g = ctx.createLinearGradient(cx, botY - h, cx, botY);
-  g.addColorStop(0, rgba(color, 0.85));
-  g.addColorStop(0.6, rgba(color, 0.28));
-  g.addColorStop(1, rgba(color, 0.04));
-  roundRectPath(ctx, cx - w / 2, botY - h, w, h, 28);
-  ctx.fillStyle = g;
-  ctx.fill();
-  ctx.strokeStyle = rgba(color, 0.7);
-  ctx.lineWidth = 2.2;
-  ctx.stroke();
-
-  if (label && p > 0.5) {
-    ctx.globalAlpha = clamp01((p - 0.5) / 0.5);
-    ctx.font = '800 32px Cinzel';
-    ctx.fillStyle = '#FFFFFF';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(label, cx, botY - h + 44);
-  }
-  ctx.restore();
-}
-
-export function drawEquationTransform(ctx, cx, cy, leftEq, rightEq, progress, t) {
-  const p = clamp01(progress);
-  if (p <= 0.01) return;
-  ctx.save();
-  ctx.translate(cx, cy);
-
-  const leftExit = clamp01(invLerp(0.32, 0.55, p));
-  const rightEnter = easeOutBack(clamp01(invLerp(0.38, 0.72, p)), 1.3);
-
-  // Left equation (Human math)
-  if (leftExit < 0.99) {
-    ctx.save();
-    ctx.globalAlpha = 1 - leftExit;
-    ctx.translate(0, -leftExit * 60);
-    ctx.scale(1 - leftExit * 0.25, 1 - leftExit * 0.25);
-    roundRectPath(ctx, -340, -105, 680, 210, 32);
-    ctx.fillStyle = 'rgba(12, 28, 25, 0.85)';
-    ctx.fill();
-    ctx.strokeStyle = rgba(THEME.slateText, 0.45);
-    ctx.lineWidth = 2;
-    ctx.stroke();
-
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.font = '700 24px JetBrains';
-    ctx.fillStyle = THEME.slateText;
-    ctx.fillText('MATEMATIKA MANUSIA', 0, -56);
-
-    ctx.font = '800 84px Cinzel';
-    ctx.fillStyle = THEME.ivoryMuted;
-    ctx.fillText(leftEq, 0, 20);
-    ctx.restore();
-  }
-
-  // Right equation (Islamic math 1 -> 700x -> ∞)
-  if (rightEnter > 0.01) {
-    ctx.save();
-    ctx.globalAlpha = clamp01(rightEnter);
-    ctx.scale(rightEnter, rightEnter);
-
-    drawMultiRingHalo(ctx, 0, 0, 220, 3, clamp01(rightEnter), t);
-    drawBigNumberCounter(ctx, 0, -10, rightEq, 'PAHALA DILIPATGANDAKAN', clamp01(rightEnter), {
-      fontSize: 168,
-      echoTrails: true,
-    });
-    ctx.restore();
-  }
-
-  ctx.restore();
-}
-
-export function drawGoldenStarburst(ctx, cx, cy, rays, minR, maxR, t, color = THEME.goldBright, alpha = 0.35) {
-  ctx.save();
-  ctx.translate(cx, cy);
-  ctx.rotate(t * 0.08);
-  ctx.globalAlpha = alpha;
-  for (let i = 0; i < rays; i++) {
-    const a = (i * TAU) / rays;
-    const len = maxR * (0.75 + 0.25 * Math.sin(t * 1.5 + i));
-    const g = ctx.createLinearGradient(Math.cos(a) * minR, Math.sin(a) * minR, Math.cos(a) * len, Math.sin(a) * len);
-    g.addColorStop(0, color);
-    g.addColorStop(1, rgba(color, 0));
-    ctx.strokeStyle = g;
-    ctx.lineWidth = i % 2 === 0 ? 3 : 1.5;
-    ctx.beginPath();
-    ctx.moveTo(Math.cos(a) * minR, Math.sin(a) * minR);
-    ctx.lineTo(Math.cos(a) * len, Math.sin(a) * len);
-    ctx.stroke();
-  }
-  ctx.restore();
-}
-
-export function drawVerticalStepCard(ctx, cx, cy, w, h, stepNum, heading, detail, accent, progress) {
-  const p = easeOutExpo(clamp01(progress));
-  if (p <= 0.01) return;
-  ctx.save();
-  ctx.globalAlpha = p;
-  const dy = (1 - p) * 28;
-  roundRectPath(ctx, cx - w / 2, cy - h / 2 + dy, w, h, 26);
-  ctx.fillStyle = 'rgba(7, 26, 21, 0.9)';
-  ctx.fill();
-  ctx.strokeStyle = rgba(accent, 0.65);
-  ctx.lineWidth = 2;
-  ctx.stroke();
-
-  // Step number medallion
-  roundRectPath(ctx, cx - w / 2 + 28, cy - 36 + dy, 72, 72, 20);
-  ctx.fillStyle = rgba(accent, 0.2);
-  ctx.fill();
-  ctx.strokeStyle = accent;
-  ctx.lineWidth = 2;
-  ctx.stroke();
-  ctx.font = '800 32px Cinzel';
-  ctx.fillStyle = accent;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(stepNum, cx - w / 2 + 64, cy + 1 + dy);
+  ctx.font = '900 28px Cinzel';
+  ctx.fillStyle = THEME.bgObsidian;
+  ctx.fillText(num, cx - 461, cy + 1 + dy);
 
   ctx.textAlign = 'left';
-  ctx.font = '800 30px Jakarta';
+  ctx.font = '800 28px Jakarta';
   ctx.fillStyle = THEME.ivory;
-  ctx.fillText(heading, cx - w / 2 + 124, cy - 18 + dy);
-
-  ctx.font = '500 24px Jakarta';
+  ctx.fillText(title, cx - 405, cy - 14 + dy);
+  ctx.font = '500 22px Jakarta';
   ctx.fillStyle = THEME.ivoryMuted;
-  ctx.fillText(detail, cx - w / 2 + 124, cy + 20 + dy);
+  ctx.fillText(desc, cx - 405, cy + 20 + dy);
   ctx.restore();
 }
 
-export function drawShimmerSweepRect(ctx, x, y, w, h, r, t, color = '#FFFFFF') {
+export function drawComparisonSplitBadge(ctx, cx, cy, leftVal, leftLbl, rightVal, rightLbl, progress) {
+  const p = easeOutExpo(clamp01(progress));
+  if (p <= 0.02) return;
   ctx.save();
-  roundRectPath(ctx, x, y, w, h, r);
-  ctx.clip();
-  const sx = x - 180 + ((t * 280) % (w + 360));
-  const g = ctx.createLinearGradient(sx - 90, y, sx + 90, y + h);
-  g.addColorStop(0, rgba(color, 0));
-  g.addColorStop(0.5, rgba(color, 0.14));
-  g.addColorStop(1, rgba(color, 0));
-  ctx.fillStyle = g;
-  ctx.fillRect(x, y, w, h);
+  ctx.globalAlpha = p;
+  drawBevelCard(ctx, cx - 540, cy - 80, 520, 160, { radius: 20, accent: THEME.turqBright });
+  drawBevelCard(ctx, cx + 20, cy - 80, 520, 160, { radius: 20, accent: THEME.goldBright });
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.font = '900 46px Cinzel';
+  ctx.fillStyle = THEME.turqBright;
+  ctx.fillText(leftVal, cx - 280, cy - 16);
+  ctx.font = '600 22px Jakarta';
+  ctx.fillStyle = THEME.ivoryMuted;
+  ctx.fillText(leftLbl, cx - 280, cy + 34);
+
+  ctx.font = '900 46px Cinzel';
+  ctx.fillStyle = THEME.goldBright;
+  ctx.fillText(rightVal, cx + 280, cy - 16);
+  ctx.font = '600 22px Jakarta';
+  ctx.fillStyle = THEME.ivoryMuted;
+  ctx.fillText(rightLbl, cx + 280, cy + 34);
   ctx.restore();
 }
 
 // ============================================================================
-// 14. ENTRYPOINT CLI
+// 12. CLI ENTRYPOINT
 // ============================================================================
 
 if (!isMainThread && workerData) {
@@ -3617,7 +3197,7 @@ if (!isMainThread && workerData) {
       const ctx = canvas.getContext('2d');
       const outDir = join(ROOT, 'out', 'previews');
       mkdirSync(outDir, { recursive: true });
-      renderSingleFrame(ctx, timeline, sceneRenderers, helpers, sc.startFrame + Math.round(sc.durationFrames * 0.55));
+      renderSingleFrame(ctx, timeline, sceneRenderers, helpers, sc.startFrame + Math.round(sc.durationFrames * 0.65));
       const p = join(outDir, `${sc.id}.png`);
       writeFileSync(p, canvas.toBufferSync('png'));
       console.log(`Rendered single frame preview: ${p}`);
