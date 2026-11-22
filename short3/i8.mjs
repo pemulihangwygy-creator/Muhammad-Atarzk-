@@ -3,55 +3,70 @@ export function renderScene(ctx, scene, localSec, H) {
     WIDTH,
     beat,
     easeOutCubic,
-    drawFakeVsSahihCard,
+    easeOutBack,
+    drawRehalKitabAndLantern,
+    drawPureWaterPitcherScene,
+    drawAntiqueParchmentScroll,
     drawCalloutBox,
     PALETTE,
   } = H;
 
-  // World C: Pengganti Hadits SHAHIH (HR. Ibnu Majah 224 & HR. Muslim 223)
-  const pair1P = beat(localSec, 2.2, 0.8, easeOutCubic);
-  const pair2P = beat(localSec, 11.2, 0.8, easeOutCubic);
-  const footP = beat(localSec, 14.5, 0.6, easeOutCubic);
+  // World C: Sunnah Sanctuary — Tangible Objects Paired with Authentic Sahih Scrolls
+  const rehalP = beat(localSec, 0.3, 0.85, easeOutCubic);
+  const scroll1P = beat(localSec, 2.0, 0.85, easeOutCubic);
+  const pitcherP = beat(localSec, 9.8, 0.9, easeOutBack);
+  const scroll2P = beat(localSec, 10.6, 0.85, easeOutCubic);
+  const noteP = beat(localSec, 12.2, 0.65, easeOutCubic);
 
-  // 1. Replacement Pair #1: Seeking Knowledge (y = 560..1075)
-  drawFakeVsSahihCard(ctx, 88, 560, WIDTH - 176, 505, {
-    fakeTitle: 'PALSU (TIDAK SAH)',
-    fakeArabic: 'وَلَوْ بِالصِّينِ',
-    fakeText: '“Tuntutlah ilmu walau sampai ke negeri Cina.” (Cacat perawi Abu ‘Atikah)',
-    sahihTitle: 'SHAHIH · HR. IBNU MAJAH 224',
-    sahihArabic: 'طَلَبُ الْعِلْمِ فَرِيضَةٌ عَلَى كُلِّ مُسْلِمٍ',
-    sahihText: '“Menuntut ilmu itu wajib atas setiap muslim.”',
-    sahihRef: 'Dinilai Shahih oleh Syaikh Al-Albani',
-    reveal: pair1P,
+  // 1. Top Row: Carved Wooden Rehal + Lantern (Left) & Authentic Hadith #1 Scroll (Right)
+  drawRehalKitabAndLantern(ctx, 275, 810, 0.82, {
+    openProg: rehalP,
+    glowPulse: localSec,
   });
 
-  // 2. Replacement Pair #2: Cleanliness & Faith (y = 1100..1615)
-  drawFakeVsSahihCard(ctx, 88, 1100, WIDTH - 176, 505, {
-    fakeTitle: 'SLOGAN KELIRU',
-    fakeArabic: 'حُبُّ الْوَطَنِ / النَّظَافَةُ',
-    fakeText: 'Menisbatkan slogan “Cinta tanah air / kebersihan sebagian iman” tanpa lafaz shahih.',
-    sahihTitle: 'SHAHIH · HR. MUSLIM NO. 223',
-    sahihArabic: 'الطُّهُورُ شَطْرُ الْإِيمَانِ',
-    sahihText: '“Kesucian (bersuci lahir & batin) adalah sebagian dari iman.”',
-    sahihRef: 'Dari Abu Malik Al-Asy’ari RA · Shahih Muslim',
-    reveal: pair2P,
+  drawAntiqueParchmentScroll(ctx, 495, 575, 860, 355, {
+    header: 'PENGGANTI SHAHIH #01 · HR. IBNU MAJAH 224',
+    arabic: 'طَلَبُ الْعِلْمِ فَرِيضَةٌ عَلَى كُلِّ مُسْلِمٍ',
+    arabicSize: 50,
+    translit: '“Thalabul ‘ilmi faridhatun ‘ala kulli muslim”',
+    meaning: '“Menuntut ilmu itu wajib atas setiap Muslim.” (Shahih — Al-Albani)',
+    accent: PALETTE.emeraldBright,
+    unroll: scroll1P,
   });
 
-  // 3. Bottom Summary Callout (y = 1640..1825)
+  // 2. Middle Row: Crystal Water Pitcher (Left) & Authentic Hadith #2 Scroll (Right)
+  if (pitcherP > 0.02) {
+    ctx.save();
+    ctx.globalAlpha = pitcherP;
+    drawPureWaterPitcherScene(ctx, 275, 1185, 1.12, localSec);
+    ctx.restore();
+  }
+
+  drawAntiqueParchmentScroll(ctx, 495, 985, 860, 355, {
+    header: 'PENGGANTI SHAHIH #02 · HR. MUSLIM NO. 223',
+    arabic: 'الطُّهُورُ شَطْرُ الْإِيمَانِ',
+    arabicSize: 54,
+    translit: '“Ath-Thuhuru syathrul iman”',
+    meaning: '“Kesucian (thaharah) adalah separuh dari keimanan.” (Shahih Muslim)',
+    accent: PALETTE.emeraldBright,
+    unroll: scroll2P,
+  });
+
+  // 3. Summary Callout Strip (fully revealed & high-contrast)
   drawCalloutBox(
     ctx,
     88,
-    1640,
+    1395,
     WIDTH - 176,
-    180,
-    'ISLAM SUDAH PUNYA RIBUAN DALIL SHAHIH:',
-    'Kita tidak pernah kekurangan hadits shahih untuk memotivasi umat — cukup kutip dari Shahih Bukhari, Muslim, dan kitab mu’tabar.',
+    205,
+    'DALIL SHAHIH SUDAH JAUH LEBIH MULIA & TERANG:',
+    'Kita tidak pernah kekurangan hadits shahih tentang kewajiban menuntut ilmu maupun keutamaan kesucian iman!',
     {
-      accent: PALETTE.sunnahEmerald,
-      bg: '#ECFDF5',
-      textColor: '#064E3B',
-      subColor: '#065F46',
-      reveal: footP,
+      accent: PALETTE.sunnahGold,
+      bg: '#0E241C',
+      textColor: '#FEF3C7',
+      subColor: '#A7F3D0',
+      reveal: noteP,
     },
   );
 }

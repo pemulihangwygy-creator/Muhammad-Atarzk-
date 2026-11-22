@@ -32,7 +32,7 @@ export const SCENES_DATA = [
     source: 'Ilmu Takhrij Hadits · Al-Jarh wa At-Ta’dil',
     voFile: 'short3/audio/vo_01.mp3',
     voText:
-      'Hati-hati! Ada kalimat yang sering kita dengar di ceramah dan status media sosial, tapi ternyata bukan sabda Nabi Muhammad shallallahu alaihi wa sallam. Apa saja tiga hadits populer yang ternyata palsu? Mari kita cek sanadnya!',
+      'Hati-hati! Ada kalimat viral yang sering kita dengar di ceramah dan status media sosial, tapi ternyata bukan sabda Nabi Muhammad shallallaahu alaihi wa sallam. Apa saja tiga hadits populer yang ternyata palsu? Mari kita telusuri!',
     transition: 'seal_crimson',
   },
   {
@@ -42,11 +42,11 @@ export const SCENES_DATA = [
     badge: 'SYARAT HADITS SAH',
     headline: 'KALIMAT INDAH BUKAN BERARTI HADITS NABI',
     highlightWords: ['BUKAN', 'HADITS'],
-    factPill: 'Wajib Punya Sanad Bersambung hingga Rasulullah SAW',
+    factPill: 'Wajib Punya Rantai Sanad Utuh hingga Rasulullah SAW',
     source: 'Ushul Hadits · Kaidah Sanad & Matan',
     voFile: 'short3/audio/vo_02.mp3',
     voText:
-      'Dalam ilmu Islam, ucapan baru sah disebut hadits jika memiliki sanad atau rantai perawi yang bersambung hingga Rasulullah. Tanpa sanad yang valid, kalimat indah sekalipun hanyalah kata mutiara, bukan sabda Nabi.',
+      'Dalam ilmu hadits, ucapan baru sah disebut sabda Nabi jika punya sanad, yaitu rantai perawi yang bersambung utuh hingga Rasulullah. Tanpa rantai sanad, kalimat seindah apa pun hanyalah kata mutiara, bukan hadits.',
     transition: 'wipe_parchment',
   },
   {
@@ -60,21 +60,21 @@ export const SCENES_DATA = [
     source: 'Al-Maudhu’at (1/215) · Al-Maqasid al-Hasanah (hlm. 63)',
     voFile: 'short3/audio/vo_03.mp3',
     voText:
-      'Pertama, kalimat tuntutlah ilmu walau sampai ke negeri Cina. Ternyata para ulama hadits seperti Imam Ibnu Hibban, Ibnul Jauzi, hingga Syekh Al-Albani memvonis hadits ini palsu atau batil tidak ada dasarnya.',
+      'Pertama, ungkapan tuntutlah ilmu walau sampai ke negeri Cina. Para imam hadits seperti Ibnu Hibban, Ibnul Jauzi, hingga Syekh Al-Albani mengetok vonis bahwa riwayat ini palsu atau batil tidak ada dasarnya.',
     transition: 'wipe_gold',
   },
   {
     id: 'i04',
     module: './i4.mjs',
     chapter: 'BEDAH SANAD #01',
-    badge: 'TITIK CACAT PERAWI',
-    headline: 'TERPUTUS DI PERAWI ABU ‘ATIKAH',
-    highlightWords: ['ABU', '‘ATIKAH'],
+    badge: 'TITIK PATAH RANTAI',
+    headline: 'RANTAI SANAD PUTUS DI ABU ‘ATIKAH',
+    highlightWords: ['PUTUS', 'ABU', '‘ATIKAH'],
     factPill: 'Abu ‘Atikah Tarif bin Sulaiman Ditolak Bukhari & An-Nasa’i',
     source: 'Al-Majruhin (Ibnu Hibban) · Jarh wa Ta’dil Bukhari & Abu Hatim',
     voFile: 'short3/audio/vo_04.mp3',
     voText:
-      'Kenapa palsu? Karena di rantai sanadnya terdapat perawi bernama Abu Atikah Tarif bin Sulaiman. Imam Bukhari, An-Nasai, dan Abu Hatim sepakat bahwa riwayatnya tertolak dan tidak bisa dipercaya.',
+      'Mengapa rantai sanadnya patah? Karena ada perawi bernama Abu Atikah Tarif bin Sulaiman. Imam Al-Bukhari, An-Nasai, dan Abu Hatim sepakat riwayatnya tertolak, sehingga rantai ke Rasulullah langsung terputus di titik ini.',
     transition: 'wipe_parchment',
   },
   {
@@ -84,11 +84,11 @@ export const SCENES_DATA = [
     badge: 'VONIS MAUDHU’',
     headline: '"CINTA TANAH AIR SEBAGIAN DARI IMAN"',
     highlightWords: ['TANAH', 'AIR'],
-    factPill: 'Hubbul Wathan Minal Iman = Bukan Sabda Nabi SAW',
+    factPill: 'Cinta Negeri = Fitrah Manusia · Bukan Sabda Nabi SAW',
     source: 'Imam Ash-Shaghani · Ali Al-Qari (Al-Mashnu’ no. 106) · Al-Albani',
     voFile: 'short3/audio/vo_05.mp3',
     voText:
-      'Kedua, ungkapan cinta tanah air adalah sebagian dari iman, atau hubbul wathan minal iman. Para ahli hadits seperti Imam Ash-Shaghani dan Ali Al-Qari menegaskan kalimat ini palsu dan tidak punya sumber sanad. Mencintai negeri adalah fitrah, tapi bukan hadits Nabi.',
+      'Kedua, ungkapan cinta tanah air sebagian dari iman, atau hubbul wathan minal iman. Imam Ash-Shaghani dan Ali Al-Qari menegaskan kalimat ini palsu tanpa asal sanad. Mencintai negeri adalah fitrah manusia, tetapi bukan sabda Nabi.',
     transition: 'wipe_gold',
   },
   {
@@ -98,11 +98,11 @@ export const SCENES_DATA = [
     badge: 'TIDAK ADA SANAD',
     headline: '"PERBEDAAN UMATKU ADALAH RAHMAT"',
     highlightWords: ['PERBEDAAN', 'RAHMAT'],
-    factPill: 'Tidak Ditemukan Sanad Bersambung ke Nabi SAW',
+    factPill: 'Perbedaan Fikih Dibahas Kitab · Kalimat Ini Bukan Hadits',
     source: 'Al-Iraqi (Takhrij Al-Ihya no. 74) · As-Silsilah Adh-Dha’ifah no. 59',
     voFile: 'short3/audio/vo_06.mp3',
     voText:
-      'Ketiga, ungkapan perbedaan pendapat umatku adalah rahmat. Imam Al-Iraqi dan Syekh Al-Albani menegaskan kalimat ini tidak memiliki sanad yang bersambung hingga Nabi. Secara makna fikih bisa dibahas ulama, namun haram menisbatkannya sebagai hadits.',
+      'Ketiga, ungkapan perbedaan pendapat umatku adalah rahmat. Imam Al-Iraqi dan Syekh Al-Albani menegaskan sanadnya tidak pernah bersambung hingga Nabi. Perbedaan fikih memang dibahas para ulama dalam kitab, namun kalimat ini bukan hadits.',
     transition: 'wipe_emerald',
   },
   {
@@ -112,11 +112,11 @@ export const SCENES_DATA = [
     badge: 'HADITS MUTAWATIR',
     headline: 'ANCAMAN BERDUSTA ATAS NAMA NABI SAW',
     highlightWords: ['BERDUSTA', 'NABI'],
-    factPill: 'Man Arafa Nafsahu = Perkataan Yahya bin Mu’adz Ar-Razi',
+    factPill: 'Man Arafa Nafsahu = Petuah Yahya bin Mu’adz Ar-Razi',
     source: 'HR. Bukhari no. 110 & Muslim no. 3 · Al-Hawi lil Fatawa (2/288)',
     voFile: 'short3/audio/vo_07.mp3',
     voText:
-      'Begitu pula ucapan siapa mengenal dirinya maka ia mengenal Tuhannya, yang ternyata perkataan ulama Yahya bin Muadz Ar-Razi. Nabi shallallahu alaihi wa sallam bersabda dalam Hadits Riwayat Bukhari dan Muslim: siapa sengaja berdusta atas namaku, siapkanlah tempat duduknya di neraka.',
+      'Begitu pula petuah siapa mengenal dirinya maka ia mengenal Tuhannya, yang aslinya ucapan ulama Yahya bin Muadz Ar-Razi. Ingat sabda Nabi dalam Riwayat Bukhari dan Muslim: siapa sengaja berdusta atas namaku, siapkan tempat duduknya di neraka.',
     transition: 'wipe_gold',
   },
   {
@@ -130,21 +130,21 @@ export const SCENES_DATA = [
     source: 'Shahih Muslim no. 223 · Sunan Ibnu Majah no. 224 (Shahih)',
     voFile: 'short3/audio/vo_08.mp3',
     voText:
-      'Lalu apa pengganti yang shahih? Alih-alih ke negeri Cina, kutip sabda Nabi dalam Riwayat Ibnu Majah: menuntut ilmu itu wajib bagi setiap muslim. Dan dalam Riwayat Muslim: kesucian atau bersuci itu sebagian dari iman.',
+      'Lalu apa gantinya yang shahih? Alih-alih ke negeri Cina, kutip Riwayat Ibnu Majah: menuntut ilmu itu wajib bagi setiap muslim. Dan dalam Riwayat Muslim: kesucian atau bersuci itu sebagian dari iman.',
     transition: 'wipe_emerald',
   },
   {
     id: 'i09',
     module: './i9.mjs',
     chapter: 'PANDUAN PRAKTIS',
-    badge: '3 LANGKAH TAKHRIJ',
-    headline: 'CARA CEPAT CEK HADITS SEBELUM SHARE',
+    badge: '3 ALAT VERIFIKASI',
+    headline: '3 LANGKAH CEK HADITS SEBELUM SHARE',
     highlightWords: ['CEK', 'HADITS'],
-    factPill: 'Verifikasi Perawi · Pisahkan Petuah · Rujuk Kitab Shahih',
+    factPill: 'Periksa Sanad · Timbang Petuah vs Sabda · Rujuk Kitab Shahih',
     source: 'Adab Menyampaikan Ilmu & Menjaga Kemurnian Sunnah',
     voFile: 'short3/audio/vo_09.mp3',
     voText:
-      'Agar tidak ikut menyebar hadits palsu, biasakan tiga langkah: cek siapa perawi dan kitabnya, pisahkan antara petuah bijak dengan sabda Nabi, lalu rujuk kitab terpercaya seperti Shahih Bukhari dan Muslim.',
+      'Agar terhindar dari hoaks hadits, biasakan tiga hal: periksa kaca pembesar sanadnya, timbang mana petuah bijak dan mana sabda Nabi, lalu rujuk kitab Shahih Bukhari dan Muslim.',
     transition: 'seal_gold',
   },
   {
@@ -154,11 +154,11 @@ export const SCENES_DATA = [
     badge: 'JAGA KEMURNIAN SUNNAH',
     headline: 'MANA YANG BARU KAMU TAHU TERNYATA PALSU?',
     highlightWords: ['BARU', 'TAHU'],
-    factPill: 'Tulis di Komentar & Bagikan ke Keluarga',
+    factPill: 'Tulis di Komentar & Bagikan ke Orang Terdekatmu',
     source: 'Takhrij & Edukasi Islam · @MuhammadAtarzk',
     voFile: 'short3/audio/vo_10.mp3',
     voText:
-      'Sekarang kita lebih berhati-hati menjaga kemurnian sunnah Nabi. Dari tiga kalimat tadi, mana yang baru kamu tahu ternyata bukan hadits? Tulis di kolom komentar dan bagikan agar bermanfaat!',
+      'Mari jaga kemurnian sunnah Nabi bersama-sama. Dari tiga kalimat tadi, mana yang baru kamu tahu ternyata bukan hadits? Tulis di kolom komentar dan bagikan ke orang terdekatmu!',
     transition: 'none',
   },
 ];

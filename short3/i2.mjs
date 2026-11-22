@@ -2,77 +2,59 @@ export function renderScene(ctx, scene, localSec, H) {
   const {
     WIDTH,
     beat,
+    clamp01,
     easeOutCubic,
     easeOutBack,
-    drawSanadVsMatanDiagram,
-    drawIsnadChainDiagram,
-    drawCalloutBox,
+    drawPhysicalSanadChain,
+    drawAntiqueParchmentScroll,
+    drawBrassBalanceScale,
     PALETTE,
   } = H;
 
-  // Metodologi: Sanad vs Matan + Contoh Rantai Perawi Sah
-  const sanadP = beat(localSec, 0.4, 0.8, easeOutCubic);
-  const matanP = beat(localSec, 2.2, 0.8, easeOutCubic);
-  const chainP = beat(localSec, 5.2, 1.8, easeOutCubic);
-  const noteP = beat(localSec, 11.4, 0.65, easeOutBack);
+  // Metodologi: Golden Chain of Narrators (Sanad) + Unfurling Scroll (Matan) + Balance Scale
+  const chainP = beat(localSec, 0.5, 2.2, easeOutCubic);
+  const scrollP = beat(localSec, 5.2, 0.9, easeOutCubic);
+  const scaleP = beat(localSec, 10.6, 0.85, easeOutBack);
+  const tilt = -0.24 * clamp01((localSec - 11.2) / 1.2);
 
-  // 1. Anatomy of Hadith: Sanad + Matan (y = 560..940)
-  drawSanadVsMatanDiagram(ctx, 88, 560, WIDTH - 176, 385, {
-    sanadProg: sanadP,
-    matanProg: matanP,
+  // 1. Top Half: Physical Interlocking Golden Chain descending from Nabi SAW -> Sahabat -> Kitab
+  drawPhysicalSanadChain(ctx, WIDTH / 2, 570, 168, [
+    {
+      name: 'Rasulullah SAW (Sumber Sabda)',
+      note: 'Setiap hadits sah wajib bersumber langsung dari lisan atau ketetapan Nabi SAW.',
+      status: 'target',
+    },
+    {
+      name: 'Rantai Perawi Bersambung (Sanad)',
+      note: 'Sahabat → Tabi’in → Imam Kitab tersambung jujur tanpa perawi pendusta.',
+      status: 'valid',
+    },
+    {
+      name: 'Tanpa Rantai = Rantai Putus!',
+      note: 'Kalimat indah tanpa sanad hanyalah kata mutiara, bukan hadits Nabi.',
+      status: 'broken',
+    },
+  ], {
+    progress: chainP,
+    isLight: false,
   });
 
-  // 2. Authentic Isnad Flow Example (y = 975..1525)
-  drawIsnadChainDiagram(
-    ctx,
-    88,
-    975,
-    WIDTH - 176,
-    545,
-    [
-      {
-        name: 'Rasulullah SAW',
-        note: 'Sumber wahyu & sabda asli',
-        tag: 'SUMBER UTAMA',
-        badge: ' SAW',
-        status: 'target',
-      },
-      {
-        name: 'Sahabat → Tabi’in → Imam Kitab',
-        note: 'Rantai perawi jujur (tsiqah) & bersambung tanpa putus',
-        tag: '✓ BERSAMBUNG',
-        badge: '✓',
-        status: 'valid',
-      },
-      {
-        name: 'Tanpa Sanad = Bukan Hadits',
-        note: 'Walau maknanya indah, hanya terhitung kata mutiara / hikmah',
-        tag: '✕ DITOLAK',
-        status: 'broken',
-      },
-    ],
-    {
-      title: 'SYARAT MUTLAK PENELUSURAN (TAKHRIJ)',
-      isLight: false,
-      progress: chainP,
-    },
-  );
+  // 2. Center: Physical Rolled Parchment Scroll representing Matan (tall enough for 2-line meaning)
+  drawAntiqueParchmentScroll(ctx, 100, 1105, WIDTH - 200, 325, {
+    header: 'MATAN (REDAKSI HADITS) HARUS PUNYA RANTAI SANAD',
+    arabic: 'الإِسْنَادُ مِنَ الدِّينِ',
+    arabicSize: 56,
+    translit: '“Al-Isnadu minad-din” — Ibnu Al-Mubarak',
+    meaning: '“Sanad adalah bagian dari agama; tanpanya orang bisa berkata sesuka hati.”',
+    accent: PALETTE.emeraldBright,
+    unroll: scrollP,
+  });
 
-  // 3. Key Principle Callout (y = 1550..1825)
-  drawCalloutBox(
-    ctx,
-    88,
-    1550,
-    WIDTH - 176,
-    260,
-    'KAIDAH EMAS IBNU AL-MUBARAK:',
-    '"Sanad adalah bagian dari agama. Seandainya tidak ada sanad, maka siapa saja akan berkata sesuka hatinya." (Muqaddimah Shahih Muslim)',
-    {
-      accent: PALETTE.emeraldBright,
-      bg: 'rgba(13, 28, 24, 0.96)',
-      textColor: '#ECFDF5',
-      subColor: '#A7F3D0',
-      reveal: noteP,
-    },
-  );
+  // 3. Bottom: Physical Brass Balance Scale separating Petuah Bijak vs Sabda Nabi
+  drawBrassBalanceScale(ctx, WIDTH / 2, 1625, 1.15, {
+    tilt,
+    leftLabel: 'KATA MUTIARA',
+    rightLabel: 'HADITS SHAHIH',
+    reveal: scaleP,
+  });
 }

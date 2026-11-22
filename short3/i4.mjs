@@ -4,88 +4,57 @@ export function renderScene(ctx, scene, localSec, H) {
     beat,
     easeOutCubic,
     easeOutBack,
-    drawIsnadChainDiagram,
-    drawScholarVerdictTable,
+    drawPhysicalSanadChain,
+    drawScholarDeskWithCandle,
     drawCalloutBox,
     PALETTE,
   } = H;
 
-  // World B: Bedah Sanad Kasus #01 — Abu 'Atikah Tarif bin Sulaiman
-  const chainP = beat(localSec, 0.4, 2.4, easeOutCubic);
-  const verdictP = beat(localSec, 7.0, 1.8, easeOutCubic);
-  const noteP = beat(localSec, 11.4, 0.65, easeOutBack);
+  // World B: Physical Chain Snapping at Turbaned Portrait of Abu 'Atikah + Kritikus Ledger
+  const chainP = beat(localSec, 0.4, 2.8, easeOutCubic);
+  const deskP = beat(localSec, 6.8, 0.85, easeOutCubic);
+  const noteP = beat(localSec, 11.8, 0.65, easeOutBack);
 
-  // 1. Isnad Chain Showing Exact Breakpoint at Abu 'Atikah (y = 560..1160)
-  drawIsnadChainDiagram(
-    ctx,
-    88,
-    560,
-    WIDTH - 176,
-    600,
-    [
-      {
-        name: 'Anas bin Malik radhiyallahu ‘anhu',
-        note: 'Sahabat Nabi SAW (perawi terpercaya)',
-        tag: 'SAHABAT',
-        badge: '01',
-        status: 'valid',
-      },
-      {
-        name: 'Abu ‘Atikah Tarif bin Sulaiman',
-        note: 'Titik cacat! Dituduh memalsukan hadits oleh para ulama Jarh wa Ta’dil',
-        tag: 'TERTOLAK / DUSTA',
-        status: 'broken',
-      },
-      {
-        name: 'Al-Hasan bin ‘Athiyyah → Kitab Tarikh',
-        note: 'Riwayat setelahnya ikut gugur karena sanad cacat di atasnya',
-        tag: 'TIDAK SAH',
-        badge: '03',
-        status: 'broken',
-      },
-    ],
+  // 1. Physical Chain of Narrators with Snapped Link at Abu 'Atikah
+  drawPhysicalSanadChain(ctx, WIDTH / 2, 575, 188, [
     {
-      title: 'BEDAH RANTAI SANAD RIWAYAT "NEGERI CINA"',
-      isLight: true,
-      progress: chainP,
+      name: 'Anas bin Malik RA (Sahabat)',
+      note: 'Sahabat Nabi SAW yang mulia dan terpercaya.',
+      status: 'valid',
     },
-  );
-
-  // 2. Verdict of Bukhari, An-Nasa'i, Abu Hatim (y = 1190..1575)
-  drawScholarVerdictTable(
-    ctx,
-    88,
-    1190,
-    WIDTH - 176,
-    385,
-    [
-      {
-        imam: 'Imam Al-Bukhari & An-Nasa’i',
-        kitab: 'Munkarul Hadits / Muttaham bil-Kadzib',
-        verdict: 'TIDAK DIPERCAYA',
-      },
-      {
-        imam: 'Imam Abu Hatim & Al-‘Uqaili',
-        kitab: 'Al-Jarh wa At-Ta’dil',
-        verdict: 'MATRUK (DITINGGALKAN)',
-      },
-    ],
     {
-      title: 'VONIS KRITIKUS PERAWI ATAS ABU ‘ATIKAH',
-      isLight: true,
-      progress: verdictP,
+      name: 'Abu ‘Atikah Tarif bin Sulaiman',
+      note: 'TITIK PATAH! Dituduh memalsukan hadits — rantai sanad langsung terputus di sini.',
+      status: 'broken',
     },
-  );
+    {
+      name: 'Al-Hasan bin ‘Athiyyah → Kitab Tarikh',
+      note: 'Seluruh jalur setelah perawi pendusta ikut tertolak & tidak sah.',
+      status: 'broken',
+    },
+  ], {
+    progress: chainP,
+    isLight: true,
+  });
 
-  // 3. Why Multiple Weak Chains Cannot Lift a Fabricated Hadith (y = 1605..1825)
+  // 2. Scholar's Desk Ledger Crossing Out Abu 'Atikah
+  drawScholarDeskWithCandle(ctx, 88, 1175, WIDTH - 176, 305, {
+    eyebrow: 'KITAB AL-JARH WA AT-TA’DIL (KRITIK PERAWI)',
+    author: 'Al-Bukhari · An-Nasa’i · Abu Hatim',
+    quote: 'Sepakat menyatakan Abu ‘Atikah adalah perawi tertolak (Matruk / Muttaham bil-Kadzib) dan riwayatnya tidak dapat dipercaya.',
+    flicker: localSec,
+    reveal: deskP,
+  });
+
+  // 3. Why Other Weak Chains Fail Too (snug fit)
   drawCalloutBox(
     ctx,
     88,
-    1605,
+    1515,
     WIDTH - 176,
-    215,
-    'KENAPA TIDAK BISA NAIK DERAJAT JADI HASAN?',
-    'Jalur lain juga bermasalah (ada perawi pendusta seperti Al-Juwaiybir), sehingga kepalsuannya tidak bisa saling menguatkan.',
+    205,
+    'RANTAI PUTUS TIDAK BISA DISAMBUNG PAKSA:',
+    'Jalur riwayat lain untuk kalimat ini juga memuat perawi pemalsu hadits (Al-Juwaiybir), sehingga tetap divonis palsu.',
     {
       accent: PALETTE.kitabCrimson,
       bg: '#FFFDF7',
