@@ -1,65 +1,60 @@
 export function renderScene(ctx, scene, localSec, H) {
   const {
     WIDTH,
+    PALETTE,
     beat,
     easeOutCubic,
     easeOutBack,
-    drawAntiqueParchmentScroll,
-    drawRehalKitabAndLantern,
-    drawMagnifyingGlassTool,
-    drawCalloutBox,
-    PALETTE,
+    drawSpotlightStageBackdrop,
+    drawRehalLanternAndLoupe,
+    drawIvoryPaperSlip,
+    drawMicroPill,
   } = H;
 
-  // World B: Unfurling Scroll + Rehal Kitab & Swinging Lantern + Sweeping Brass Magnifying Glass
-  const scrollP = beat(localSec, 0.2, 0.85, easeOutCubic);
-  const stampP = beat(localSec, 7.6, 0.6, easeOutBack);
-  const rehalP = beat(localSec, 4.4, 0.9, easeOutCubic);
-  const loupeP = beat(localSec, 8.8, 0.8, easeOutCubic);
-  const noteP = beat(localSec, 12.2, 0.65, easeOutCubic);
+  // Overhead Spotlight Stage + Carved Wooden Rehal + Hanging Brass Lantern + Sweeping Loupe
+  drawSpotlightStageBackdrop(ctx, localSec, {
+    coneColor: 'rgba(245, 158, 11, 0.12)',
+    floorY: 1620,
+  });
 
-  // 1. Unfurling Scroll: Ikhtilafu Ummati Rahmah
-  drawAntiqueParchmentScroll(ctx, 88, 560, WIDTH - 176, 345, {
-    header: 'KASUS #03 · KLAIM POPULER',
-    arabic: 'اِخْتِلَافُ أُمَّتِي رَحْمَةٌ',
-    arabicSize: 64,
-    translit: '“Ikhtilafu ummati rahmah”',
-    meaning: '“Perbedaan di antara umatku adalah rahmat.”',
-    accent: PALETTE.kitabCrimson,
-    unroll: scrollP,
-    stampLabel: 'NO SANAD',
-    stampSub: 'TIDAK ADA ASAL',
+  const slipP = beat(localSec, 0.25, 0.7, easeOutBack);
+  const stampP = beat(localSec, 6.2, 0.55, easeOutBack);
+  const rehalP = beat(localSec, 3.0, 0.85, easeOutCubic);
+  const loupeP = beat(localSec, 5.0, 0.75, easeOutBack);
+  const pill1 = beat(localSec, 8.2, 0.55, easeOutCubic);
+  const pill2 = beat(localSec, 11.4, 0.55, easeOutCubic);
+
+  // Top Floating Ivory Kitab Verification Slip
+  drawIvoryPaperSlip(ctx, WIDTH / 2, 470, 1080, 290, {
+    eyebrow: 'KASUS #03 · اِخْتِلَافُ أُمَّتِي رَحْمَةٌ',
+    headline: '“Perbedaan umatku adalah rahmat”',
+    struckClaim: 'DISANDARKAN KE NABI SAW',
+    verdict: 'TIDAK ADA SANADNYA',
+    metaRightTop: 'AL-IRAQI',
+    metaRightBot: 'AL-ALBANI',
+    barcode: true,
+    stampText: 'SANAD NIHIL',
     stampReveal: stampP,
+    tilt: 0.012,
+    reveal: slipP,
   });
 
-  // 2. Side-by-side Physical Artifacts: Rehal + Lantern (left) & Sweeping Magnifying Loupe (right)
-  drawRehalKitabAndLantern(ctx, WIDTH / 2 - 235, 1245, 0.96, {
+  // Detailed 2D Carved Wooden Rehal + Hanging Brass Fanoos + Sweeping Loupe
+  drawRehalLanternAndLoupe(ctx, WIDTH / 2, 1040, 1.32, {
     openProg: rehalP,
-    glowPulse: localSec,
+    loupeReveal: loupeP,
+    localSec,
   });
 
-  if (loupeP > 0.02) {
-    ctx.save();
-    ctx.globalAlpha = loupeP;
-    drawMagnifyingGlassTool(ctx, WIDTH / 2 + 235, 1185, 1.08, localSec);
-    ctx.restore();
-  }
-
-  // 3. Verdict Strip (compact, zero dead space)
-  drawCalloutBox(
-    ctx,
-    88,
-    1475,
-    WIDTH - 176,
-    225,
-    'TIDAK DITEMUKAN DI KITAB HADITS MANAPUN:',
-    'Al-Hafizh Al-Iraqi (Takhrij Al-Ihya no. 74), Imam As-Subki, hingga Al-Albani menegaskan kalimat ini tidak bersanad. Yang shahih: persatuan adalah rahmat.',
-    {
-      accent: PALETTE.kitabCrimson,
-      bg: '#FFFDF7',
-      textColor: PALETTE.kitabInk,
-      subColor: PALETTE.kitabMuted,
-      reveal: noteP,
-    },
-  );
+  // Clarification Micro-Pills below Rehal
+  drawMicroPill(ctx, WIDTH / 2, 1385, 'AL-IRAQI · AL-ALBANI: TIDAK DITEMUKAN SANADNYA', {
+    dotColor: PALETTE.crimson,
+    reveal: pill1,
+  });
+  drawMicroPill(ctx, WIDTH / 2, 1465, 'FIKIH BOLEH BEDA · AKIDAH WAJIB BERSATU', {
+    dotColor: PALETTE.amber,
+    bg: 'rgba(26, 20, 12, 0.94)',
+    stroke: 'rgba(245, 158, 11, 0.45)',
+    reveal: pill2,
+  });
 }

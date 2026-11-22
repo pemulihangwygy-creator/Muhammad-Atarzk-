@@ -1,60 +1,48 @@
 export function renderScene(ctx, scene, localSec, H) {
   const {
     WIDTH,
+    PALETTE,
     beat,
-    clamp01,
     easeOutCubic,
     easeOutBack,
-    drawPhysicalSanadChain,
-    drawAntiqueParchmentScroll,
-    drawBrassBalanceScale,
-    PALETTE,
+    drawBlueprintGridBackdrop,
+    drawPrecisionDialHero,
   } = H;
 
-  // Metodologi: Golden Chain of Narrators (Sanad) + Unfurling Scroll (Matan) + Balance Scale
-  const chainP = beat(localSec, 0.5, 2.2, easeOutCubic);
-  const scrollP = beat(localSec, 5.2, 0.9, easeOutCubic);
-  const scaleP = beat(localSec, 10.6, 0.85, easeOutBack);
-  const tilt = -0.24 * clamp01((localSec - 11.2) / 1.2);
-
-  // 1. Top Half: Physical Interlocking Golden Chain descending from Nabi SAW -> Sahabat -> Kitab
-  drawPhysicalSanadChain(ctx, WIDTH / 2, 570, 168, [
-    {
-      name: 'Rasulullah SAW (Sumber Sabda)',
-      note: 'Setiap hadits sah wajib bersumber langsung dari lisan atau ketetapan Nabi SAW.',
-      status: 'target',
-    },
-    {
-      name: 'Rantai Perawi Bersambung (Sanad)',
-      note: 'Sahabat → Tabi’in → Imam Kitab tersambung jujur tanpa perawi pendusta.',
-      status: 'valid',
-    },
-    {
-      name: 'Tanpa Rantai = Rantai Putus!',
-      note: 'Kalimat indah tanpa sanad hanyalah kata mutiara, bukan hadits Nabi.',
-      status: 'broken',
-    },
-  ], {
-    progress: chainP,
-    isLight: false,
+  // Blueprint Grid Backdrop + Rotating Precision Tick-Dial SANAD Hero (ref_14s & ref_20s!)
+  drawBlueprintGridBackdrop(ctx, localSec, {
+    glowColor: 'rgba(245, 158, 11, 0.16)',
+    gridAlpha: 0.045,
   });
 
-  // 2. Center: Physical Rolled Parchment Scroll representing Matan (tall enough for 2-line meaning)
-  drawAntiqueParchmentScroll(ctx, 100, 1105, WIDTH - 200, 325, {
-    header: 'MATAN (REDAKSI HADITS) HARUS PUNYA RANTAI SANAD',
+  const heroP = beat(localSec, 0.2, 0.75, easeOutBack);
+  const p1 = beat(localSec, 1.8, 0.5, easeOutCubic);
+  const p2 = beat(localSec, 2.8, 0.5, easeOutCubic);
+  const p3 = beat(localSec, 3.8, 0.5, easeOutCubic);
+  const p4 = beat(localSec, 4.8, 0.5, easeOutCubic);
+  const p5 = beat(localSec, 5.8, 0.5, easeOutCubic);
+  const p6 = beat(localSec, 6.8, 0.5, easeOutCubic);
+  const formulaP = beat(localSec, 8.2, 0.75, easeOutCubic);
+
+  drawPrecisionDialHero(ctx, WIDTH / 2, 760, {
+    heroText: 'SANAD',
+    subtitle: 'RANTAI PERAWI BERSAMBUNG',
     arabic: 'الإِسْنَادُ مِنَ الدِّينِ',
-    arabicSize: 56,
-    translit: '“Al-Isnadu minad-din” — Ibnu Al-Mubarak',
-    meaning: '“Sanad adalah bagian dari agama; tanpanya orang bisa berkata sesuka hati.”',
-    accent: PALETTE.emeraldBright,
-    unroll: scrollP,
-  });
-
-  // 3. Bottom: Physical Brass Balance Scale separating Petuah Bijak vs Sabda Nabi
-  drawBrassBalanceScale(ctx, WIDTH / 2, 1625, 1.15, {
-    tilt,
-    leftLabel: 'KATA MUTIARA',
-    rightLabel: 'HADITS SHAHIH',
-    reveal: scaleP,
+    phase: localSec,
+    reveal: heroP,
+    orbitPills: [
+      { x: 255, y: 465, label: 'RASULULLAH SAW', color: PALETTE.amber, reveal: p1 },
+      { x: 1170, y: 495, label: 'SAHABAT', color: PALETTE.teal, reveal: p2 },
+      { x: 215, y: 780, label: 'TABI\'IN', color: PALETTE.sky, reveal: p3 },
+      { x: 1215, y: 790, label: 'JUJUR', color: PALETTE.emerald, reveal: p4 },
+      { x: 270, y: 1030, label: 'BERSAMBUNG', color: PALETTE.amber, reveal: p5 },
+      { x: 1150, y: 1030, label: 'KITAB SHAHIH', color: PALETTE.teal, reveal: p6 },
+    ],
+    formulaLabel: 'KAIDAH PENENTU DERAJAT HADITS',
+    formulaLeft: 'SAH =',
+    formulaNum: 'Sanad Bersambung + Perawi Jujur',
+    formulaDen: 'Tanpa Sanad = Sekadar Kata Mutiara',
+    formulaRight: '✓ VALID',
+    formulaReveal: formulaP,
   });
 }

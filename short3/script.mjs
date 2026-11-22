@@ -12,8 +12,8 @@ export const SAMPLE_RATE = 48000;
 
 export const VIDEO_CONFIG = {
   title: '3 "Hadits" Populer Ini Ternyata BUKAN Sabda Nabi SAW! (Cek Sanad Ulama)',
-  channelHandle: '@MuhammadAtarzk',
-  categoryLabel: 'TAKHRIJ HADITS · FORENSIK SANAD ISLAM',
+  channelHandle: 'MUHAMMAD ATARZK',
+  categoryLabel: 'TAKHRIJ · SANAD HADITS',
   outputVideo: join(ROOT, 'out', '3_Hadits_Populer_Ternyata_Bukan_Sabda_Nabi_2K_90fps.mp4'),
   paketFile: join(ROOT, 'out', 'Paket_Metadata_Cek_Hadits_Palsu.txt'),
   timelineFile: join(ROOT, '.tmp', 'short3_timeline.json'),
@@ -24,142 +24,85 @@ export const SCENES_DATA = [
   {
     id: 'i01',
     module: './i1.mjs',
-    chapter: 'PEMBUKA',
-    badge: 'PERINGATAN SANAD',
+    chapter: '01 — PEMBUKA',
     headline: '3 "HADITS" POPULER INI TERNYATA PALSU',
-    highlightWords: ['TERNYATA', 'PALSU'],
-    factPill: 'Sering Beredar di Ceramah & Status Media Sosial',
-    source: 'Ilmu Takhrij Hadits · Al-Jarh wa At-Ta’dil',
     voFile: 'short3/audio/vo_01.mp3',
     voText:
-      'Hati-hati! Ada kalimat viral yang sering kita dengar di ceramah dan status media sosial, tapi ternyata bukan sabda Nabi Muhammad shallallaahu alaihi wa sallam. Apa saja tiga hadits populer yang ternyata palsu? Mari kita telusuri!',
-    transition: 'seal_crimson',
+      'Hati-hati. Tiga kalimat viral ini sering disebut hadits, padahal bukan sabda Nabi Muhammad shalallahu alaihi wa salam. Apa saja? Mari kita cek!',
+    captionText:
+      'Hati-hati. Tiga kalimat viral ini sering disebut hadits, padahal bukan sabda Nabi Muhammad shallallahu alaihi wa sallam. Apa saja? Mari kita cek!',
   },
   {
     id: 'i02',
     module: './i2.mjs',
-    chapter: 'METODOLOGI',
-    badge: 'SYARAT HADITS SAH',
+    chapter: '02 — SANAD',
     headline: 'KALIMAT INDAH BUKAN BERARTI HADITS NABI',
-    highlightWords: ['BUKAN', 'HADITS'],
-    factPill: 'Wajib Punya Rantai Sanad Utuh hingga Rasulullah SAW',
-    source: 'Ushul Hadits · Kaidah Sanad & Matan',
     voFile: 'short3/audio/vo_02.mp3',
     voText:
-      'Dalam ilmu hadits, ucapan baru sah disebut sabda Nabi jika punya sanad, yaitu rantai perawi yang bersambung utuh hingga Rasulullah. Tanpa rantai sanad, kalimat seindah apa pun hanyalah kata mutiara, bukan hadits.',
-    transition: 'wipe_parchment',
+      'Dalam ilmu hadits, ucapan baru sah disebut sabda Nabi jika punya sanad, yaitu rantai perawi yang jujur dan bersambung utuh hingga Rasulullah. Tanpa sanad, kalimat indah hanyalah kata mutiara.',
   },
   {
     id: 'i03',
     module: './i3.mjs',
-    chapter: 'KASUS #01',
-    badge: 'VONIS ULAMA HADITS',
+    chapter: '03 — NEGERI CINA',
     headline: '"TUNTUTLAH ILMU SAMPAI KE NEGERI CINA"',
-    highlightWords: ['NEGERI', 'CINA'],
-    factPill: 'Divonis Bathil & Maudhu’ oleh Ibnu Hibban & Ibnul Jauzi',
-    source: 'Al-Maudhu’at (1/215) · Al-Maqasid al-Hasanah (hlm. 63)',
     voFile: 'short3/audio/vo_03.mp3',
     voText:
-      'Pertama, ungkapan tuntutlah ilmu walau sampai ke negeri Cina. Para imam hadits seperti Ibnu Hibban, Ibnul Jauzi, hingga Syekh Al-Albani mengetok vonis bahwa riwayat ini palsu atau batil tidak ada dasarnya.',
-    transition: 'wipe_gold',
+      'Pertama, tuntutlah ilmu walau sampai ke negeri Cina. Imam Ibnu Hibban, Ibnul Jauzi, hingga Syekh Al-Albani memvonis riwayat ini palsu dan batil.',
   },
   {
     id: 'i04',
     module: './i4.mjs',
-    chapter: 'BEDAH SANAD #01',
-    badge: 'TITIK PATAH RANTAI',
+    chapter: '04 — ABU ATIKAH',
     headline: 'RANTAI SANAD PUTUS DI ABU ‘ATIKAH',
-    highlightWords: ['PUTUS', 'ABU', '‘ATIKAH'],
-    factPill: 'Abu ‘Atikah Tarif bin Sulaiman Ditolak Bukhari & An-Nasa’i',
-    source: 'Al-Majruhin (Ibnu Hibban) · Jarh wa Ta’dil Bukhari & Abu Hatim',
     voFile: 'short3/audio/vo_04.mp3',
     voText:
-      'Mengapa rantai sanadnya patah? Karena ada perawi bernama Abu Atikah Tarif bin Sulaiman. Imam Al-Bukhari, An-Nasai, dan Abu Hatim sepakat riwayatnya tertolak, sehingga rantai ke Rasulullah langsung terputus di titik ini.',
-    transition: 'wipe_parchment',
+      'Penyebabnya ada pada perawi bernama Abu Atikah Tarif bin Sulaiman. Imam Al-Bukhari dan An-Nasai sepakat menolaknya, sehingga rantai sanad langsung patah di sini.',
   },
   {
     id: 'i05',
     module: './i5.mjs',
-    chapter: 'KASUS #02',
-    badge: 'VONIS MAUDHU’',
+    chapter: '05 — TANAH AIR',
     headline: '"CINTA TANAH AIR SEBAGIAN DARI IMAN"',
-    highlightWords: ['TANAH', 'AIR'],
-    factPill: 'Cinta Negeri = Fitrah Manusia · Bukan Sabda Nabi SAW',
-    source: 'Imam Ash-Shaghani · Ali Al-Qari (Al-Mashnu’ no. 106) · Al-Albani',
     voFile: 'short3/audio/vo_05.mp3',
     voText:
-      'Kedua, ungkapan cinta tanah air sebagian dari iman, atau hubbul wathan minal iman. Imam Ash-Shaghani dan Ali Al-Qari menegaskan kalimat ini palsu tanpa asal sanad. Mencintai negeri adalah fitrah manusia, tetapi bukan sabda Nabi.',
-    transition: 'wipe_gold',
+      'Kedua, cinta tanah air sebagian dari iman. Imam Ash-Shaghani dan Ali Al-Qari menegaskan kalimat ini palsu tanpa sanad. Mencintai negeri adalah fitrah manusia, bukan hadits Nabi.',
   },
   {
     id: 'i06',
     module: './i6.mjs',
-    chapter: 'KASUS #03',
-    badge: 'TIDAK ADA SANAD',
+    chapter: '06 — PERBEDAAN',
     headline: '"PERBEDAAN UMATKU ADALAH RAHMAT"',
-    highlightWords: ['PERBEDAAN', 'RAHMAT'],
-    factPill: 'Perbedaan Fikih Dibahas Kitab · Kalimat Ini Bukan Hadits',
-    source: 'Al-Iraqi (Takhrij Al-Ihya no. 74) · As-Silsilah Adh-Dha’ifah no. 59',
     voFile: 'short3/audio/vo_06.mp3',
     voText:
-      'Ketiga, ungkapan perbedaan pendapat umatku adalah rahmat. Imam Al-Iraqi dan Syekh Al-Albani menegaskan sanadnya tidak pernah bersambung hingga Nabi. Perbedaan fikih memang dibahas para ulama dalam kitab, namun kalimat ini bukan hadits.',
-    transition: 'wipe_emerald',
+      'Ketiga, perbedaan pendapat umatku adalah rahmat. Imam Al-Iraqi dan Al-Albani menjelaskan sanadnya tidak ditemukan. Perbedaan fikih memang dibahas ulama, tetapi kalimat ini bukan hadits.',
   },
   {
     id: 'i07',
     module: './i7.mjs',
-    chapter: 'PERINGATAN KERAS',
-    badge: 'HADITS MUTAWATIR',
+    chapter: '07 — PERINGATAN',
     headline: 'ANCAMAN BERDUSTA ATAS NAMA NABI SAW',
-    highlightWords: ['BERDUSTA', 'NABI'],
-    factPill: 'Man Arafa Nafsahu = Petuah Yahya bin Mu’adz Ar-Razi',
-    source: 'HR. Bukhari no. 110 & Muslim no. 3 · Al-Hawi lil Fatawa (2/288)',
     voFile: 'short3/audio/vo_07.mp3',
     voText:
-      'Begitu pula petuah siapa mengenal dirinya maka ia mengenal Tuhannya, yang aslinya ucapan ulama Yahya bin Muadz Ar-Razi. Ingat sabda Nabi dalam Riwayat Bukhari dan Muslim: siapa sengaja berdusta atas namaku, siapkan tempat duduknya di neraka.',
-    transition: 'wipe_gold',
+      'Termasuk petuah siapa mengenal dirinya mengenal Tuhannya, yang aslinya ucapan Yahya bin Muadz Ar-Razi. Ingat ancaman Bukhari dan Muslim: siapa sengaja berdusta atas namaku, siapkan tempatnya di neraka.',
   },
   {
     id: 'i08',
     module: './i8.mjs',
-    chapter: 'PENGGANTI SHAHIH',
-    badge: 'DALIL ASLI',
+    chapter: '08 — SHAHIH',
     headline: 'KUTIP YANG SHAHIH, TINGGALKAN YANG PALSU',
-    highlightWords: ['YANG', 'SHAHIH'],
-    factPill: 'HR. Ibnu Majah 224 (Ilmu Wajib) & HR. Muslim 223 (Kesucian)',
-    source: 'Shahih Muslim no. 223 · Sunan Ibnu Majah no. 224 (Shahih)',
     voFile: 'short3/audio/vo_08.mp3',
     voText:
-      'Lalu apa gantinya yang shahih? Alih-alih ke negeri Cina, kutip Riwayat Ibnu Majah: menuntut ilmu itu wajib bagi setiap muslim. Dan dalam Riwayat Muslim: kesucian atau bersuci itu sebagian dari iman.',
-    transition: 'wipe_emerald',
+      'Lalu apa gantinya yang shahih? Kutip Riwayat Ibnu Majah: menuntut ilmu itu wajib bagi setiap muslim. Dan Riwayat Muslim: kesucian adalah separuh dari iman.',
   },
   {
     id: 'i09',
     module: './i9.mjs',
-    chapter: 'PANDUAN PRAKTIS',
-    badge: '3 ALAT VERIFIKASI',
-    headline: '3 LANGKAH CEK HADITS SEBELUM SHARE',
-    highlightWords: ['CEK', 'HADITS'],
-    factPill: 'Periksa Sanad · Timbang Petuah vs Sabda · Rujuk Kitab Shahih',
-    source: 'Adab Menyampaikan Ilmu & Menjaga Kemurnian Sunnah',
+    chapter: '09 — PENUTUP',
+    headline: 'CEK SANAD SEBELUM SEBAR KUTIPAN',
     voFile: 'short3/audio/vo_09.mp3',
     voText:
-      'Agar terhindar dari hoaks hadits, biasakan tiga hal: periksa kaca pembesar sanadnya, timbang mana petuah bijak dan mana sabda Nabi, lalu rujuk kitab Shahih Bukhari dan Muslim.',
-    transition: 'seal_gold',
-  },
-  {
-    id: 'i10',
-    module: './i10.mjs',
-    chapter: 'PENUTUP',
-    badge: 'JAGA KEMURNIAN SUNNAH',
-    headline: 'MANA YANG BARU KAMU TAHU TERNYATA PALSU?',
-    highlightWords: ['BARU', 'TAHU'],
-    factPill: 'Tulis di Komentar & Bagikan ke Orang Terdekatmu',
-    source: 'Takhrij & Edukasi Islam · @MuhammadAtarzk',
-    voFile: 'short3/audio/vo_10.mp3',
-    voText:
-      'Mari jaga kemurnian sunnah Nabi bersama-sama. Dari tiga kalimat tadi, mana yang baru kamu tahu ternyata bukan hadits? Tulis di kolom komentar dan bagikan ke orang terdekatmu!',
-    transition: 'none',
+      'Jadi sebelum menyebarkan kutipan, cek dulu perawi dan kitab aslinya. Mana dari tiga kalimat tadi yang baru kamu tahu? Tulis di komentar dan bagikan ke orang terdekatmu!',
   },
 ];
 
@@ -251,18 +194,21 @@ function probeDurationSec(ffmpeg, filePath) {
   return Number(m[1]) * 3600 + Number(m[2]) * 60 + Number(m[3]);
 }
 
-function tokenizeWordsTimed(voText, durationSec) {
-  const cleanTokens = voText.trim().split(/\s+/);
-  const weights = cleanTokens.map((w) => {
-    let wt = Math.max(2, w.replace(/[^a-zA-Z0-9]/g, '').length);
-    if (/[,.?!:;]$/.test(w)) wt += 2.6;
+function tokenizeWordsTimed(displayText, spokenText, durationSec) {
+  const dispTokens = displayText.trim().split(/\s+/);
+  const spkTokens = spokenText.trim().split(/\s+/);
+  const weights = dispTokens.map((w, idx) => {
+    const sw = spkTokens[idx] || w;
+    let wt = Math.max(2, sw.replace(/[^a-zA-Z0-9]/g, '').length);
+    if (/[,;]$/.test(w)) wt += 2.2;
+    if (/[.?!:]$/.test(w)) wt += 3.2;
     return wt;
   });
   const totalWeight = weights.reduce((a, b) => a + b, 0);
-  const padStart = 0.04;
-  const usable = Math.max(0.5, durationSec - 0.14);
+  const padStart = 0.05;
+  const usable = Math.max(0.5, durationSec - 0.16);
   let cursor = padStart;
-  return cleanTokens.map((word, idx) => {
+  return dispTokens.map((word, idx) => {
     const seg = (weights[idx] / totalWeight) * usable;
     const item = { word, start: cursor, end: cursor + seg };
     cursor += seg;
@@ -279,7 +225,7 @@ export function buildAudioAndTimeline() {
   const normalizedClips = [];
   const sceneTimings = [];
   let cursorSec = 0;
-  const gapSec = 0.24;
+  const gapSec = 0.22;
 
   for (let i = 0; i < SCENES_DATA.length; i++) {
     const sc = SCENES_DATA[i];
@@ -288,10 +234,10 @@ export function buildAudioAndTimeline() {
       throw new Error(`Missing VO audio: ${absVo}`);
     }
     const rawDur = probeDurationSec(ffmpeg, absVo);
-    const clipPad = i === SCENES_DATA.length - 1 ? 0.55 : gapSec;
+    const clipPad = i === SCENES_DATA.length - 1 ? 0.50 : gapSec;
     const totalSceneSec = rawDur + clipPad;
 
-    const normWav = join(tmpDir, `norm_${sc.id}.wav`);
+    const normFlac = join(tmpDir, `norm_${sc.id}.flac`);
     execFileSync(
       ffmpeg,
       [
@@ -307,14 +253,14 @@ export function buildAudioAndTimeline() {
         '-ac',
         '2',
         '-c:a',
-        'pcm_s16le',
-        normWav,
+        'flac',
+        normFlac,
       ],
       { stdio: 'ignore' },
     );
-    normalizedClips.push(normWav);
+    normalizedClips.push(normFlac);
 
-    const exactDur = probeDurationSec(ffmpeg, normWav);
+    const exactDur = probeDurationSec(ffmpeg, normFlac);
     const startSec = cursorSec;
     const endSec = startSec + exactDur;
     const startFrame = Math.round(startSec * FPS);
@@ -329,7 +275,7 @@ export function buildAudioAndTimeline() {
       startFrame,
       endFrame,
       durationFrames: endFrame - startFrame,
-      words: tokenizeWordsTimed(sc.voText, rawDur),
+      words: tokenizeWordsTimed(sc.captionText || sc.voText, sc.voText, rawDur),
     });
 
     cursorSec = endSec;
@@ -338,10 +284,10 @@ export function buildAudioAndTimeline() {
   const concatList = join(tmpDir, 'concat.txt');
   writeFileSync(concatList, normalizedClips.map((p) => `file '${p}'`).join('\n'));
 
-  const masterWav = join(tmpDir, 'master_vo.wav');
+  const masterFlac = join(tmpDir, 'master_vo.flac');
   execFileSync(
     ffmpeg,
-    ['-y', '-f', 'concat', '-safe', '0', '-i', concatList, '-c', 'copy', masterWav],
+    ['-y', '-f', 'concat', '-safe', '0', '-i', concatList, '-c:a', 'flac', masterFlac],
     { stdio: 'ignore' },
   );
 
@@ -353,7 +299,7 @@ export function buildAudioAndTimeline() {
     [
       '-y',
       '-i',
-      masterWav,
+      masterFlac,
       '-af',
       'loudnorm=I=-14:TP=-1.5:LRA=9,apad=pad_dur=0.6',
       '-t',
