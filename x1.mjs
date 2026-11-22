@@ -1,23 +1,18 @@
-export default function renderScene(ctx, { scene, localT, totalT, durationSec, sceneAlpha, h }) {
+export default function renderScene(ctx, { scene, localT, totalT, durationSec, sceneAlpha, worldKey, h }) {
   ctx.save();
   ctx.globalAlpha = sceneAlpha;
 
   const cam = h.createCameraState(localT, durationSec, {
-    zoomStart: 1.024,
+    zoomStart: 1.022,
     zoomEnd: 1.0,
-    pushAt: 4.5,
+    impactAt: 4.8,
   });
 
   ctx.save();
   h.applyCamera(ctx, cam);
 
-  h.drawArchitecturalStage(ctx, totalT, 'emerald');
-  h.drawHumanVsIslamicMath(ctx, h.WIDTH / 2, 1080, localT, totalT);
-  h.drawArabicPlaque(ctx, scene, h.WIDTH / 2, 1815, 1120, localT, {
-    delay: 2.0,
-    arabicSize: 50,
-    showTrans: true,
-  });
+  h.drawEditorialStage(ctx, worldKey, totalT);
+  h.renderScene01(ctx, scene, localT, totalT);
 
   ctx.restore();
   ctx.restore();

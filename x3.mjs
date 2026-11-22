@@ -1,4 +1,4 @@
-export default function renderScene(ctx, { scene, localT, totalT, durationSec, sceneAlpha, h }) {
+export default function renderScene(ctx, { scene, localT, totalT, durationSec, sceneAlpha, worldKey, h }) {
   ctx.save();
   ctx.globalAlpha = sceneAlpha;
 
@@ -10,13 +10,8 @@ export default function renderScene(ctx, { scene, localT, totalT, durationSec, s
   ctx.save();
   h.applyCamera(ctx, cam);
 
-  h.drawArchitecturalStage(ctx, totalT, 'justice');
-  h.drawPrecisionMizan(ctx, h.WIDTH / 2, 1110, localT, totalT);
-  h.drawArabicPlaque(ctx, scene, h.WIDTH / 2, 1815, 1140, localT, {
-    delay: 0.9,
-    arabicSize: 44,
-    showTrans: true,
-  });
+  h.drawEditorialStage(ctx, worldKey, totalT);
+  h.renderScene03(ctx, scene, localT, totalT);
 
   ctx.restore();
   ctx.restore();

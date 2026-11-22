@@ -1,23 +1,18 @@
-export default function renderScene(ctx, { scene, localT, totalT, durationSec, sceneAlpha, h }) {
+export default function renderScene(ctx, { scene, localT, totalT, durationSec, sceneAlpha, worldKey, h }) {
   ctx.save();
   ctx.globalAlpha = sceneAlpha;
 
   const cam = h.createCameraState(localT, durationSec, {
-    zoomStart: 1.025,
+    zoomStart: 1.02,
     zoomEnd: 1.0,
-    pushAt: 2.3,
+    impactAt: 11.3,
   });
 
   ctx.save();
   h.applyCamera(ctx, cam);
 
-  h.drawArchitecturalStage(ctx, totalT, 'nocturne');
-  h.drawBreakthroughAltitudeMeter(ctx, h.WIDTH / 2, 1100, localT, totalT);
-  h.drawArabicPlaque(ctx, scene, h.WIDTH / 2, 1805, 1140, localT, {
-    delay: 1.3,
-    arabicSize: 44,
-    showTrans: true,
-  });
+  h.drawEditorialStage(ctx, worldKey, totalT);
+  h.renderScene09(ctx, scene, localT, totalT);
 
   ctx.restore();
   ctx.restore();
